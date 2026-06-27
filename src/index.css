@@ -1,0 +1,441 @@
+/*
+ * src/index.css  —  Tailwind v4
+ *
+ * GeoLearn Design System — "GIS in the 50s" Brand Palette
+ *
+ * Brand identity:
+ *   Primary:   Terracotta Orange (#D45B34) — Tea liquid / Primary actions
+ *   Secondary: Deep Egyptian Teal (#2C6B6E) — Map base / Dark accents
+ *   Accent:    Mint Green (#7BC676) — Freshness / Success states
+ *   Warm:      Desert Amber (#EAA850) — Compass / Highlights
+ *
+ * Migration notes (v3 → v4):
+ *   @import url(...)            → stays at top
+ *   @tailwind base/…/utilities  → replaced by  @import "tailwindcss"
+ *   tailwind.config.js colors   → @theme { --color-* }
+ *   darkMode: "class"           → @custom-variant dark
+ *   @layer utilities { .foo{} } → @utility foo { }
+ */
+
+/* ── 1. Google Fonts — MUST be first @import in the file ─────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
+
+/* ── 2. Tailwind v4 entry point ──────────────────────────────────────────── */
+@import "tailwindcss";
+
+/* ── 3. Dark mode — class strategy ──────────────────────────────────────── */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ── 4. Design tokens — "GIS in the 50s" brand palette ───────────────────── */
+@theme {
+  /* ── Typography ───────────────────────────────────────────── */
+  --font-body:    "Tajawal", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Tajawal", ui-sans-serif, system-ui, sans-serif;
+
+  /* ── Brand Core Palette ──────────────────────────────────── */
+  --color-brand-primary:   #D45B34;  /* Terracotta Orange */
+  --color-brand-secondary: #2C6B6E;  /* Deep Egyptian Teal */
+  --color-brand-accent:    #7BC676;  /* Mint Green */
+  --color-brand-warm:      #EAA850;  /* Desert Amber */
+
+  /* ── Light Mode Canvas ───────────────────────────────────── */
+  --color-bg-light:          #FAF8F5;  /* Parchment White */
+  --color-panel-light:       #FFFFFF;  /* Pure Paper White */
+  --color-text-light-main:   #1A2221;  /* Charcoal Teal */
+  --color-text-light-muted:  #5C6A66;  /* Muted Sage */
+  --color-border-light:      #E8E2D9;  /* Soft Clay */
+
+  /* ── Dark Mode Canvas ────────────────────────────────────── */
+  --color-bg-dark:           #0A1110;  /* Night Onyx Teal */
+  --color-panel-dark:        #121D1B;  /* Elevated Moss */
+  --color-text-dark-main:    #F1F5F4;  /* Ivory Mint */
+  --color-text-dark-muted:   #8FA39E;  /* Dusty Sage */
+  --color-border-dark:       #1F302D;  /* Deep Trench */
+
+  /* ── Semantic tokens — light theme ───────────────────────── */
+  --color-background:              #FAF8F5;
+  --color-foreground:              #1A2221;
+
+  --color-card:                    #FFFFFF;
+  --color-card-foreground:         #1A2221;
+
+  --color-popover:                 #FFFFFF;
+  --color-popover-foreground:      #1A2221;
+
+  --color-primary:                 #2C6B6E;
+  --color-primary-foreground:      #F1F5F4;
+
+  --color-secondary:               #F0EDE8;
+  --color-secondary-foreground:    #1A2221;
+
+  --color-muted:                   #F0EDE8;
+  --color-muted-foreground:        #5C6A66;
+
+  --color-accent:                  #D45B34;
+  --color-accent-foreground:       #FFFFFF;
+
+  --color-destructive:             #DC2626;
+  --color-destructive-foreground:  #FFFFFF;
+
+  --color-border:                  #E8E2D9;
+  --color-input:                   #E8E2D9;
+  --color-ring:                    #D45B34;
+
+  /* ── Sidebar tokens ───────────────────────────────────────── */
+  --color-sidebar:                      #F5F2EE;
+  --color-sidebar-foreground:           #1A2221;
+  --color-sidebar-primary:              #2C6B6E;
+  --color-sidebar-primary-foreground:   #F1F5F4;
+  --color-sidebar-accent:               #F0EDE8;
+  --color-sidebar-accent-foreground:    #1A2221;
+  --color-sidebar-border:               #E8E2D9;
+  --color-sidebar-ring:                 #D45B34;
+
+  /* ── Border radius ────────────────────────────────────────── */
+  --radius:     0.625rem;
+  --radius-sm:  calc(var(--radius) - 4px);
+  --radius-md:  calc(var(--radius) - 2px);
+  --radius-lg:  var(--radius);
+  --radius-xl:  calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+
+  /* ── Shadows ──────────────────────────────────────────────── */
+  --shadow-card:      0 4px 24px hsl(0 0% 0% / 8%);
+  --shadow-brand:     0 4px 20px hsl(14 64% 51% / 35%);
+  --shadow-brand-lg:  0 8px 32px hsl(14 64% 51% / 45%);
+
+  /* ── Gradient backgrounds ─────────────────────────────────── */
+  --background-image-brand-gradient: linear-gradient(135deg, #D45B34 0%, #B84A2A 100%);
+}
+
+/* ── 5. Dark theme overrides ─────────────────────────────────────────────── */
+/*
+ * Deep teal-black dark theme with Egyptian warmth.
+ * Designed for premium feel with layered depth:
+ *   bg-dark → panel-dark → popover (each layer slightly brighter)
+ *
+ * Key design decisions:
+ *   • Background uses Night Onyx Teal for depth with teal undertone
+ *   • Cards use Elevated Moss for clear hierarchy
+ *   • Borders use Deep Trench for subtle definition
+ *   • Muted text (Dusty Sage) is bright enough for WCAG AA
+ *   • Brand accents remain vibrant against dark surfaces
+ */
+.dark {
+  --color-background:              #0A1110;
+  --color-foreground:              #F1F5F4;
+
+  --color-card:                    #121D1B;
+  --color-card-foreground:         #F1F5F4;
+
+  --color-popover:                 #172422;
+  --color-popover-foreground:      #F1F5F4;
+
+  --color-primary:                 #D45B34;
+  --color-primary-foreground:      #FFFFFF;
+
+  --color-secondary:               #1A2B28;
+  --color-secondary-foreground:    #F1F5F4;
+
+  --color-muted:                   #1A2B28;
+  --color-muted-foreground:        #8FA39E;
+
+  --color-accent:                  #EAA850;
+  --color-accent-foreground:       #0A1110;
+
+  --color-destructive:             #EF4444;
+  --color-destructive-foreground:  #FFFFFF;
+
+  --color-border:                  #1F302D;
+  --color-input:                   #1A2B28;
+  --color-ring:                    #EAA850;
+
+  /* ── Sidebar — slightly darker than card ────────────────── */
+  --color-sidebar:                      #0E1816;
+  --color-sidebar-foreground:           #F1F5F4;
+  --color-sidebar-primary:              #D45B34;
+  --color-sidebar-primary-foreground:   #FFFFFF;
+  --color-sidebar-accent:               #1A2B28;
+  --color-sidebar-accent-foreground:    #F1F5F4;
+  --color-sidebar-border:               #1F302D;
+  --color-sidebar-ring:                 #EAA850;
+
+  /* ── Dark-specific shadows — subtle warm glow ───────────── */
+  --shadow-card:      0 2px 16px hsl(0 0% 0% / 30%), 0 0 1px hsl(170 15% 30% / 8%);
+  --shadow-brand:     0 4px 24px hsl(14 64% 51% / 25%);
+  --shadow-brand-lg:  0 8px 36px hsl(14 64% 51% / 35%);
+}
+
+/* ── 6. Base element styles ──────────────────────────────────────────────── */
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-body);
+    font-feature-settings: "kern" 1, "liga" 1;
+  }
+
+  /* ── Custom Scrollbar — adapts to light/dark theme ────────── */
+
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+  }
+
+  /* Webkit (Chrome, Safari, Edge) */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+    transition: background 0.2s ease;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-muted-foreground);
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  ::-webkit-scrollbar-thumb:active {
+    background: var(--color-brand-primary);
+    border: 1px solid transparent;
+    background-clip: content-box;
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
+
+/* ── 7. Keyframe definitions ─────────────────────────────────────────────── */
+/*
+ * ROOT CAUSE FIX: these keyframes were missing, so every element with
+ * `animate-fade-in-up opacity-0` or `animate-fade-in opacity-0` stayed
+ * permanently invisible — the animation never ran and `opacity-0` stuck.
+ *
+ * `animation-fill-mode: both` means:
+ *   backwards → applies the `from` state during animation-delay (covers opacity-0)
+ *   forwards  → holds the `to` state after the animation ends (opacity stays 1)
+ * With `both`, you no longer need the standalone `opacity-0` class at all,
+ * but leaving it is harmless since the keyframe overrides it once the
+ * animation begins.
+ */
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/*
+ * Ken Burns subtle zoom — used by HeroSlideshow background images.
+ * Each active slide slowly scales from 100% → 108% over 8 s, adding
+ * depth to the hero without being distracting.
+ */
+@keyframes ken-burns {
+  from { transform: scale(1);    }
+  to   { transform: scale(1.08); }
+}
+
+@keyframes shimmer {
+  from { background-position: -200% center; }
+  to   { background-position: 200% center; }
+}
+
+/* ── 8. Custom utilities ─────────────────────────────────────────────────── */
+/*
+ * v4: @utility replaces @layer utilities { .foo {} }.
+ * These classes gain all Tailwind variants automatically (hover:, dark:, etc.)
+ */
+
+/* ── Animation utilities ──────────────────────────────────── */
+
+@utility animate-fade-in-up {
+  animation: fade-in-up 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@utility animate-fade-in {
+  animation: fade-in 0.65s ease-out both;
+}
+
+@utility animate-ken-burns {
+  animation: ken-burns 8s ease-out both;
+}
+
+/* ── Brand gradient / shadow utilities ───────────────────── */
+
+@utility bg-brand-gradient {
+  background-image: var(--background-image-brand-gradient);
+}
+
+@utility shadow-card {
+  box-shadow: var(--shadow-card);
+}
+
+@utility shadow-brand {
+  box-shadow: var(--shadow-brand);
+}
+
+@utility shadow-brand-lg {
+  box-shadow: var(--shadow-brand-lg);
+}
+
+/* ── Font aliases ─────────────────────────────────────────── */
+
+@utility font-display {
+  font-family: var(--font-display);
+}
+
+@utility font-body {
+  font-family: var(--font-body);
+}
+
+/* ── Staggered animation delays ──────────────────────────── */
+
+@utility animation-delay-100 { animation-delay: 100ms; }
+@utility animation-delay-200 { animation-delay: 200ms; }
+@utility animation-delay-300 { animation-delay: 300ms; }
+@utility animation-delay-400 { animation-delay: 400ms; }
+@utility animation-delay-500 { animation-delay: 500ms; }
+@utility animation-delay-600 { animation-delay: 600ms; }
+@utility animation-delay-700 { animation-delay: 700ms; }
+@utility animation-delay-800 { animation-delay: 800ms; }
+
+/* ── Scrollbar ────────────────────────────────────────────── */
+
+@utility scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ── Text gradient ────────────────────────────────────────── */
+
+@utility text-gradient-brand {
+  background: linear-gradient(135deg, #D45B34 0%, #EAA850 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Glass morphism ───────────────────────────────────────── */
+
+@utility glass {
+  background: rgb(255 255 255 / 8%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgb(255 255 255 / 10%);
+
+  .dark & {
+    background: rgb(255 255 255 / 4%);
+    border: 1px solid rgb(255 255 255 / 8%);
+  }
+}
+
+/* ── Typewriter animation ────────────────────────────────── */
+
+@keyframes typing {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+
+@keyframes blink {
+  50% { border-color: transparent; }
+}
+
+@utility animate-typewriter {
+  overflow: hidden;
+  white-space: nowrap;
+  width: 0;
+  animation:
+    typing 3.5s steps(40, end) forwards,
+    blink 0.75s step-end infinite;
+}
+
+/* ── 9. Globe loader skeleton ────────────────────────────────────────────── */
+
+@keyframes globe-spin {
+  from { transform: rotateY(0deg); }
+  to   { transform: rotateY(360deg); }
+}
+
+@keyframes globe-pulse {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50%      { opacity: 0.7;  transform: scale(1.04); }
+}
+
+.globe-loader {
+  position: relative;
+  width: 280px;
+  height: 280px;
+  perspective: 800px;
+  animation: globe-pulse 2.4s ease-in-out infinite;
+}
+
+.globe-loader__ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid hsl(14 64% 51% / 40%);  /* terracotta tint */
+}
+
+.globe-loader__ring--equator {
+  transform: rotateX(75deg);
+  animation: globe-spin 3s linear infinite;
+}
+
+.globe-loader__ring--meridian-1 {
+  transform: rotateY(30deg);
+  animation: globe-spin 4s linear infinite;
+}
+
+.globe-loader__ring--meridian-2 {
+  transform: rotateY(-30deg);
+  animation: globe-spin 4s linear infinite reverse;
+}
+
+.globe-loader__glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60px;
+  height: 60px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, hsl(14 64% 51% / 25%) 0%, transparent 70%);
+  filter: blur(8px);
+}
