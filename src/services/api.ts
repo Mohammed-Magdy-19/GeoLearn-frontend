@@ -29,7 +29,7 @@ import { useAuthStore } from "../store/useAuthStore";
 
 // ── Base Configuration ────────────────────────────────────────────────────
 
-export const BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/api` || "http://localhost:8000/api";
+export const BASE_URL = `${import.meta.env.VITE_API_BASE_URL}api` || "http://localhost:8000/api";
 
 // ── Main API Instance ─────────────────────────────────────────────────────
 
