@@ -1,0 +1,12 @@
+{
+    "rewrites": [
+        {
+            "source": "/api/:path*",
+            "destination": "https://railway.app*"
+        },
+        {
+            "source": "/((?!assets/|favicon.ico).*)",
+            "destination": "/index.html"
+        }
+    ]
+}
