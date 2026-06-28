@@ -335,6 +335,11 @@ export const fetchSecureVideoStream = async (
     return URL.createObjectURL(response.data);
   } catch (error) {
     const axiosError = error as AxiosError;
+    if (axiosError.response?.status === 404) {
+      throw new Error(
+        "Video file is missing on the server. The lesson video may need to be re-uploaded."
+      );
+    }
     if (axiosError.response?.status === 403) {
       throw new Error("Session expired or invalid. Please reload the lesson.");
     }
