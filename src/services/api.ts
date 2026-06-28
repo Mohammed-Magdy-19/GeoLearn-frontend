@@ -29,7 +29,13 @@ import { useAuthStore } from "../store/useAuthStore";
 
 // ── Base Configuration ────────────────────────────────────────────────────
 
-export const BASE_URL = `${import.meta.env.VITE_API_BASE_URL}api` || "http://localhost:8000/api";
+// 1. Fetch the raw domain variable safely first
+const rawBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+
+// 2. Format it safely to guarantee a single closing slash before appending 'api'
+const formattedBaseUrl = rawBaseUrl.endsWith("/") ? rawBaseUrl : `${rawBaseUrl}/`;
+
+export const BASE_URL = `${formattedBaseUrl}api`;
 
 // ── Main API Instance ─────────────────────────────────────────────────────
 
