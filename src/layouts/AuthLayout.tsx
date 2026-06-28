@@ -55,7 +55,7 @@ export default function AuthLayout() {
           src={PANEL_BG}
           alt=""
           aria-hidden="true"
-          loading="lazy"
+          loading="eager"
           className="absolute inset-0 h-full w-full object-cover"
         />
 

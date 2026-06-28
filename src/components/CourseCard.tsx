@@ -83,7 +83,7 @@ export default function CourseCard({ course, index, isEnrolled = false }: Course
         <img
           src={coverImage}
           alt={title}
-          loading="lazy"
+          loading="eager"
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
 

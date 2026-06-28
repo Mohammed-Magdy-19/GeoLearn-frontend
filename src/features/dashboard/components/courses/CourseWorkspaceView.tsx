@@ -105,7 +105,7 @@ export const CourseWorkspaceView: React.FC<CourseWorkspaceViewProps> = ({
                 <img
                   src={courseDetail.thumbnail_url}
                   alt={courseDetail.title}
-                  loading="lazy"
+                  loading="eager"
                   className="w-full h-full object-cover"
                 />
               ) : (

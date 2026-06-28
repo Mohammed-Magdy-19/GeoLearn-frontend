@@ -51,7 +51,7 @@ export function CourseDetailCard({
                     <img
                         src={course.cover_image_url}
                         alt={course.title}
-                        loading="lazy"
+                        loading="eager"
                         className="w-full h-full object-cover"
                     />
                 </div>

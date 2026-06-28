@@ -25,7 +25,7 @@ export const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
         <img
           src={avatarUrl}
           alt={t('profile.profilePhoto')}
-          loading="lazy"
+          loading="eager"
           className="w-full h-full object-cover"
         />
       ) : (

@@ -309,7 +309,7 @@ export const DashboardLayout = () => {
               <img
                 src={user.avatar}
                 alt={user.full_name}
-                loading="lazy"
+                loading="eager"
                 className="h-9 w-9 rounded-full object-cover shrink-0 ring-2 ring-brand-warm/30"
               />
             ) : (
