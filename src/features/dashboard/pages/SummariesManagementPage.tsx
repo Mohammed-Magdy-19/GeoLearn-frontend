@@ -14,6 +14,64 @@ import { useAdminSummaries } from "../hooks/useSummariesQuery";
 import { useSummariesHandlers } from "../hooks/useSummariesHandlers";
 import SummaryFormModal from "../components/summaries/SummaryFormModal";
 import type { AdminSummary } from "../types/summaryTypes";
+import { CardGridSkeleton } from "@/components/ui/Skeletons";
+
+type SummariesPageState = "loading" | "empty" | "data";
+
+interface SummariesPageRenderProps {
+  summaries: AdminSummary[];
+  totalPages: number;
+  page: number;
+  setPage: React.Dispatch<React.SetStateAction<number>>;
+  handleOpenCreate: () => void;
+  handleOpenEdit: (s: AdminSummary) => void;
+  handleDeleteSummary: (s: AdminSummary) => void;
+  t: (key: string, options?: Record<string, string | number>) => string;
+}
+
+const SUMMARIES_PAGE_MAP: Record<SummariesPageState, React.FC<SummariesPageRenderProps>> = {
+  loading: () => <CardGridSkeleton count={6} />,
+  empty: ({ handleOpenCreate }) => <EmptyState onCreateClick={handleOpenCreate} />,
+  data: ({ summaries, totalPages, page, setPage, handleOpenEdit, handleDeleteSummary, t }) => (
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {summaries.map((summary) => (
+          <SummaryCard
+            key={summary.id}
+            summary={summary}
+            onEdit={handleOpenEdit}
+            onDelete={handleDeleteSummary}
+          />
+        ))}
+      </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 pt-4">
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={page <= 1}
+            onClick={() => setPage((p) => p - 1)}
+          >
+            {t("common.previous")}
+          </Button>
+          <span className="text-sm text-muted-foreground px-3">
+            {page} / {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={page >= totalPages}
+            onClick={() => setPage((p) => p + 1)}
+          >
+            {t("common.next")}
+          </Button>
+        </div>
+      )}
+    </>
+  ),
+};
 
 export const SummariesManagementPage = () => {
   const { t } = useTranslation();
@@ -36,6 +94,14 @@ export const SummariesManagementPage = () => {
   const summaries = data?.results ?? [];
   const totalCount = data?.count ?? 0;
   const totalPages = Math.ceil(totalCount / 10);
+
+  const stateKey: SummariesPageState = isLoading
+    ? "loading"
+    : summaries.length === 0
+    ? "empty"
+    : "data";
+
+  const ContentComponent = SUMMARIES_PAGE_MAP[stateKey] || SUMMARIES_PAGE_MAP.empty;
 
   return (
     <div className="space-y-6">
@@ -70,53 +136,18 @@ export const SummariesManagementPage = () => {
       </div>
 
       {/* Content */}
-      {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-48 rounded-xl bg-muted animate-pulse" />
-          ))}
-        </div>
-      ) : summaries.length === 0 ? (
-        <EmptyState onCreateClick={handleOpenCreate} />
-      ) : (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {summaries.map((summary) => (
-              <SummaryCard
-                key={summary.id}
-                summary={summary}
-                onEdit={handleOpenEdit}
-                onDelete={handleDeleteSummary}
-              />
-            ))}
-          </div>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 pt-4">
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={page <= 1}
-                onClick={() => setPage((p) => p - 1)}
-              >
-                {t("common.previous")}
-              </Button>
-              <span className="text-sm text-muted-foreground px-3">
-                {page} / {totalPages}
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={page >= totalPages}
-                onClick={() => setPage((p) => p + 1)}
-              >
-                {t("common.next")}
-              </Button>
-            </div>
-          )}
-        </>
-      )}
+      <div>
+        <ContentComponent
+          summaries={summaries}
+          totalPages={totalPages}
+          page={page}
+          setPage={setPage}
+          handleOpenCreate={handleOpenCreate}
+          handleOpenEdit={handleOpenEdit}
+          handleDeleteSummary={handleDeleteSummary}
+          t={t}
+        />
+      </div>
 
       {/* Form Modal */}
       <SummaryFormModal

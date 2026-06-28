@@ -10,6 +10,48 @@ import { useAdminSpatialData } from "../hooks/useSpatialDataQuery";
 import { useSpatialDataHandlers } from "../hooks/useSpatialDataHandlers";
 import SpatialDataFormModal from "../components/spatial-data/SpatialDataFormModal";
 import type { AdminSpatialDataEntry } from "../types/spatialDataTypes";
+import { CardGridSkeleton } from "@/components/ui/Skeletons";
+
+type SpatialDataPageState = "loading" | "empty" | "data";
+
+interface SpatialDataPageRenderProps {
+  entries: AdminSpatialDataEntry[];
+  totalPages: number;
+  page: number;
+  setPage: React.Dispatch<React.SetStateAction<number>>;
+  handleOpenCreate: () => void;
+  handleOpenEdit: (e: AdminSpatialDataEntry) => void;
+  handleDelete: (e: AdminSpatialDataEntry) => void;
+  t: (key: string, options?: Record<string, string | number>) => string;
+}
+
+const SPATIAL_DATA_PAGE_MAP: Record<SpatialDataPageState, React.FC<SpatialDataPageRenderProps>> = {
+  loading: () => <CardGridSkeleton count={6} />,
+  empty: ({ handleOpenCreate, t }) => (
+    <div className="text-center py-16 border border-dashed border-border rounded-xl">
+      <MapPin className="size-10 text-muted-foreground mx-auto mb-4" />
+      <h3 className="text-lg font-semibold text-foreground mb-2">{t("dashboard.noSpatialDataYet")}</h3>
+      <p className="text-sm text-muted-foreground mb-6">{t("dashboard.addFirstSpatialData")}</p>
+      <Button onClick={handleOpenCreate} className="bg-brand-primary hover:bg-brand-primary/90 text-white font-bold">{t("dashboard.addFirstSpatialDataButton")}</Button>
+    </div>
+  ),
+  data: ({ entries, totalPages, page, setPage, handleOpenEdit, handleDelete, t }) => (
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {entries.map((entry) => (
+          <SpatialCard key={entry.id} entry={entry} onEdit={handleOpenEdit} onDelete={handleDelete} />
+        ))}
+      </div>
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 pt-4">
+          <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>{t("common.previous")}</Button>
+          <span className="text-sm text-muted-foreground px-3">{page} / {totalPages}</span>
+          <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>{t("common.next")}</Button>
+        </div>
+      )}
+    </>
+  ),
+};
 
 export const SpatialDataManagementPage = () => {
   const { t } = useTranslation();
@@ -21,6 +63,14 @@ export const SpatialDataManagementPage = () => {
   const entries = data?.results ?? [];
   const totalCount = data?.count ?? 0;
   const totalPages = Math.ceil(totalCount / 10);
+
+  const stateKey: SpatialDataPageState = isLoading
+    ? "loading"
+    : entries.length === 0
+    ? "empty"
+    : "data";
+
+  const ContentComponent = SPATIAL_DATA_PAGE_MAP[stateKey] || SPATIAL_DATA_PAGE_MAP.empty;
 
   return (
     <div className="space-y-6">
@@ -37,33 +87,20 @@ export const SpatialDataManagementPage = () => {
 
       <Input placeholder={t("dashboard.searchSpatialData")} value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} className="max-w-sm" />
 
-      {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-48 rounded-xl bg-muted animate-pulse" />)}
-        </div>
-      ) : entries.length === 0 ? (
-        <div className="text-center py-16 border border-dashed border-border rounded-xl">
-          <MapPin className="size-10 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">{t("dashboard.noSpatialDataYet")}</h3>
-          <p className="text-sm text-muted-foreground mb-6">{t("dashboard.addFirstSpatialData")}</p>
-          <Button onClick={handleOpenCreate} className="bg-brand-primary hover:bg-brand-primary/90 text-white font-bold">{t("dashboard.addFirstSpatialDataButton")}</Button>
-        </div>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {entries.map((entry) => (
-              <SpatialCard key={entry.id} entry={entry} onEdit={handleOpenEdit} onDelete={handleDelete} />
-            ))}
-          </div>
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 pt-4">
-              <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>{t("common.previous")}</Button>
-              <span className="text-sm text-muted-foreground px-3">{page} / {totalPages}</span>
-              <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>{t("common.next")}</Button>
-            </div>
-          )}
-        </>
-      )}
+      {/* Content */}
+      <div>
+        <ContentComponent
+          entries={entries}
+          totalPages={totalPages}
+          page={page}
+          setPage={setPage}
+          handleOpenCreate={handleOpenCreate}
+          handleOpenEdit={handleOpenEdit}
+          handleDelete={handleDelete}
+          t={t}
+        />
+      </div>
+
       <SpatialDataFormModal isOpen={isFormOpen} onClose={handleCloseForm} onSubmit={handleSave} initialData={editingEntry} isSubmitting={isMutating} />
     </div>
   );

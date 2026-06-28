@@ -10,6 +10,48 @@ import { useAdminMetadata } from "../hooks/useMetadataQuery";
 import { useMetadataHandlers } from "../hooks/useMetadataHandlers";
 import MetadataFormModal from "../components/metadata/MetadataFormModal";
 import type { AdminMetadataEntry } from "../types/metadataTypes";
+import { CardGridSkeleton } from "@/components/ui/Skeletons";
+
+type MetadataPageState = "loading" | "empty" | "data";
+
+interface MetadataPageRenderProps {
+  entries: AdminMetadataEntry[];
+  totalPages: number;
+  page: number;
+  setPage: React.Dispatch<React.SetStateAction<number>>;
+  handleOpenCreate: () => void;
+  handleOpenEdit: (e: AdminMetadataEntry) => void;
+  handleDelete: (e: AdminMetadataEntry) => void;
+  t: (key: string, options?: Record<string, string | number>) => string;
+}
+
+const METADATA_PAGE_MAP: Record<MetadataPageState, React.FC<MetadataPageRenderProps>> = {
+  loading: () => <CardGridSkeleton count={6} />,
+  empty: ({ handleOpenCreate, t }) => (
+    <div className="text-center py-16 border border-dashed border-border rounded-xl">
+      <ClipboardList className="size-10 text-muted-foreground mx-auto mb-4" />
+      <h3 className="text-lg font-semibold text-foreground mb-2">{t("dashboard.noMetadataYet")}</h3>
+      <p className="text-sm text-muted-foreground mb-6">{t("dashboard.addFirstMetadata")}</p>
+      <Button onClick={handleOpenCreate} className="bg-brand-primary hover:bg-brand-primary/90 text-white font-bold">{t("dashboard.addFirstMetadataButton")}</Button>
+    </div>
+  ),
+  data: ({ entries, totalPages, page, setPage, handleOpenEdit, handleDelete, t }) => (
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {entries.map((entry) => (
+          <MetadataCard key={entry.id} entry={entry} onEdit={handleOpenEdit} onDelete={handleDelete} />
+        ))}
+      </div>
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 pt-4">
+          <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>{t("common.previous")}</Button>
+          <span className="text-sm text-muted-foreground px-3">{page} / {totalPages}</span>
+          <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>{t("common.next")}</Button>
+        </div>
+      )}
+    </>
+  ),
+};
 
 export const MetadataManagementPage = () => {
   const { t } = useTranslation();
@@ -21,6 +63,14 @@ export const MetadataManagementPage = () => {
   const entries = data?.results ?? [];
   const totalCount = data?.count ?? 0;
   const totalPages = Math.ceil(totalCount / 10);
+
+  const stateKey: MetadataPageState = isLoading
+    ? "loading"
+    : entries.length === 0
+    ? "empty"
+    : "data";
+
+  const ContentComponent = METADATA_PAGE_MAP[stateKey] || METADATA_PAGE_MAP.empty;
 
   return (
     <div className="space-y-6">
@@ -37,33 +87,20 @@ export const MetadataManagementPage = () => {
 
       <Input placeholder={t("dashboard.searchMetadata")} value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} className="max-w-sm" />
 
-      {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-48 rounded-xl bg-muted animate-pulse" />)}
-        </div>
-      ) : entries.length === 0 ? (
-        <div className="text-center py-16 border border-dashed border-border rounded-xl">
-          <ClipboardList className="size-10 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">{t("dashboard.noMetadataYet")}</h3>
-          <p className="text-sm text-muted-foreground mb-6">{t("dashboard.addFirstMetadata")}</p>
-          <Button onClick={handleOpenCreate} className="bg-brand-primary hover:bg-brand-primary/90 text-white font-bold">{t("dashboard.addFirstMetadataButton")}</Button>
-        </div>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {entries.map((entry) => (
-              <MetadataCard key={entry.id} entry={entry} onEdit={handleOpenEdit} onDelete={handleDelete} />
-            ))}
-          </div>
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 pt-4">
-              <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>{t("common.previous")}</Button>
-              <span className="text-sm text-muted-foreground px-3">{page} / {totalPages}</span>
-              <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>{t("common.next")}</Button>
-            </div>
-          )}
-        </>
-      )}
+      {/* Content */}
+      <div>
+        <ContentComponent
+          entries={entries}
+          totalPages={totalPages}
+          page={page}
+          setPage={setPage}
+          handleOpenCreate={handleOpenCreate}
+          handleOpenEdit={handleOpenEdit}
+          handleDelete={handleDelete}
+          t={t}
+        />
+      </div>
+
       <MetadataFormModal isOpen={isFormOpen} onClose={handleCloseForm} onSubmit={handleSave} initialData={editingEntry} isSubmitting={isMutating} />
     </div>
   );

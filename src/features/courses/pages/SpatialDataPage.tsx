@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import api from "@/services/api";
 import type { PublicSpatialDataEntry } from "@/features/dashboard/types/spatialDataTypes";
 import { MapPin, ExternalLink, ArrowRight, Download, Layers } from "lucide-react";
+import { MapPageSkeleton } from "@/components/ui/Skeletons";
 
 // Fix Leaflet default icon issue in bundlers
 delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl;
@@ -65,9 +66,7 @@ export default function SpatialDataPage() {
       </div>
 
       {isLoading ? (
-        <div className="flex-1 flex items-center justify-center bg-muted/30">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-        </div>
+        <MapPageSkeleton />
       ) : !entries || entries.length === 0 ? (
         <div className="flex-1 flex items-center justify-center px-4">
           <div className="py-16 text-center max-w-md border border-border/40 bg-card/40 backdrop-blur rounded-2xl shadow-md p-8">

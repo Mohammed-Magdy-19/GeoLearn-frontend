@@ -5,6 +5,7 @@ import type { AdminCourse, AdminCourseDetail, AdminModule, AdminLesson } from ".
 import ModuleItem from "./ModuleItem";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { CourseWorkspaceSkeleton } from "@/components/ui/Skeletons";
 
 interface CourseWorkspaceViewProps {
   courseDetail: AdminCourseDetail | undefined;
@@ -35,6 +36,11 @@ export const CourseWorkspaceView: React.FC<CourseWorkspaceViewProps> = ({
   onBackToList,
 }) => {
   const { t } = useTranslation();
+
+  if (!courseDetail) {
+    return <CourseWorkspaceSkeleton />;
+  }
+
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Course Workspace Header */}
@@ -51,53 +57,44 @@ export const CourseWorkspaceView: React.FC<CourseWorkspaceViewProps> = ({
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-2xl font-bold text-foreground font-display">
-                {courseDetail ? courseDetail.title : t('common.loading')}
+                {courseDetail.title}
               </h1>
-              {courseDetail && (
-                <Badge
-                  variant={courseDetail.is_published ? "default" : "secondary"}
-                  className={
-                    courseDetail.is_published
-                      ? "bg-brand-accent/10 text-brand-accent border-brand-accent/20"
-                      : ""
-                  }
-                >
-                  {courseDetail.is_published ? t('courses.published') : t('courses.draft')}
-                </Badge>
-              )}
+              <Badge
+                variant={courseDetail.is_published ? "default" : "secondary"}
+                className={
+                  courseDetail.is_published
+                    ? "bg-brand-accent/10 text-brand-accent border-brand-accent/20"
+                    : ""
+                }
+              >
+                {courseDetail.is_published ? t('courses.published') : t('courses.draft')}
+              </Badge>
             </div>
             <p className="text-muted-foreground mt-1 text-sm">
               {t('dashboard.courseWorkspaceDesc')}
             </p>
           </div>
         </div>
-        {courseDetail && (
-          <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              onClick={() => onEditCourse(courseDetail)}
-              className="gap-2"
-            >
-              <Pencil className="size-4" />
-              {t('dashboard.editCourse')}
-            </Button>
-            <Button
-              onClick={onAddModuleClick}
-              className="bg-brand-primary hover:bg-brand-primary/90 text-white font-medium shadow-brand gap-2"
-            >
-              <Plus className="size-4" />
-              {t('dashboard.addModule')}
-            </Button>
-          </div>
-        )}
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            onClick={() => onEditCourse(courseDetail)}
+            className="gap-2"
+          >
+            <Pencil className="size-4" />
+            {t('dashboard.editCourse')}
+          </Button>
+          <Button
+            onClick={onAddModuleClick}
+            className="bg-brand-primary hover:bg-brand-primary/90 text-white font-medium shadow-brand gap-2"
+          >
+            <Plus className="size-4" />
+            {t('dashboard.addModule')}
+          </Button>
+        </div>
       </div>
 
-      {!courseDetail ? (
-        <div className="py-20 flex justify-center items-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-primary"></div>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
           {/* Left 1/3 Column: Course Details */}
           <div className="lg:col-span-1 rounded-xl border border-border bg-card shadow-card p-6 space-y-5">
             <div className="aspect-video rounded-lg bg-muted overflow-hidden relative border border-border">
@@ -184,8 +181,7 @@ export const CourseWorkspaceView: React.FC<CourseWorkspaceViewProps> = ({
             </div>
           </div>
         </div>
-      )}
-    </div>
+      </div>
   );
 };
 

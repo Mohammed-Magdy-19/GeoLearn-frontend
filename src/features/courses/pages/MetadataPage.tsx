@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import api from "@/services/api";
 import type { PublicMetadataEntry } from "@/features/dashboard/types/metadataTypes";
 import { ClipboardList, ExternalLink, Download, ArrowRight } from "lucide-react";
+import { CardGridSkeleton } from "@/components/ui/Skeletons";
 
 function usePublicMetadata() {
   return useQuery<PublicMetadataEntry[]>({
@@ -39,9 +40,7 @@ export default function MetadataPage() {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-36 rounded-xl bg-muted animate-pulse" />)}
-        </div>
+        <CardGridSkeleton count={4} columnsClass="grid grid-cols-1 md:grid-cols-2 gap-4" />
       ) : !entries || entries.length === 0 ? (
         <div className="py-16 text-center max-w-md mx-auto border border-border/40 bg-card/40 backdrop-blur rounded-2xl shadow-md p-8">
           <ClipboardList className="w-16 h-16 mx-auto mb-6 text-brand-primary animate-bounce" />
