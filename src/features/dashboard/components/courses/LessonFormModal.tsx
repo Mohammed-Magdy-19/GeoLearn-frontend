@@ -21,6 +21,7 @@ interface LessonFormModalProps {
   onClose: () => void;
   onSubmit: (data: LessonPayload) => void;
   initialData?: AdminLesson | null;
+  isSubmitting?: boolean;
 }
 
 const LessonFormModal: React.FC<LessonFormModalProps> = ({
@@ -29,6 +30,7 @@ const LessonFormModal: React.FC<LessonFormModalProps> = ({
   onClose,
   onSubmit,
   initialData,
+  isSubmitting = false,
 }) => {
   const { t } = useTranslation();
   const [title, setTitle] = useState("");
@@ -277,14 +279,17 @@ const LessonFormModal: React.FC<LessonFormModalProps> = ({
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={handleClose}>
+            <Button type="button" variant="outline" onClick={handleClose} disabled={isSubmitting || isReadingDuration}>
               {t('common.cancel')}
             </Button>
             <Button
               type="submit"
-              disabled={isReadingDuration}
-              className="bg-brand-primary hover:bg-brand-primary/90 text-white font-medium shadow-brand disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isReadingDuration || isSubmitting}
+              className="bg-brand-primary hover:bg-brand-primary/90 text-white font-medium shadow-brand disabled:opacity-50 disabled:cursor-not-allowed gap-2"
             >
+              {isSubmitting && (
+                <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              )}
               {initialData ? t('dashboard.saveChanges') : t('dashboard.addLesson')}
             </Button>
           </DialogFooter>

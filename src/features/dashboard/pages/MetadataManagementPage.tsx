@@ -16,7 +16,7 @@ export const MetadataManagementPage = () => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const { data, isLoading } = useAdminMetadata(page, search);
-  const { editingEntry, isFormOpen, handleOpenCreate, handleOpenEdit, handleCloseForm, handleSave, handleDelete } = useMetadataHandlers();
+  const { editingEntry, isFormOpen, handleOpenCreate, handleOpenEdit, handleCloseForm, handleSave, handleDelete, isMutating } = useMetadataHandlers();
 
   const entries = data?.results ?? [];
   const totalCount = data?.count ?? 0;
@@ -64,7 +64,7 @@ export const MetadataManagementPage = () => {
           )}
         </>
       )}
-      <MetadataFormModal isOpen={isFormOpen} onClose={handleCloseForm} onSubmit={handleSave} initialData={editingEntry} />
+      <MetadataFormModal isOpen={isFormOpen} onClose={handleCloseForm} onSubmit={handleSave} initialData={editingEntry} isSubmitting={isMutating} />
     </div>
   );
 };

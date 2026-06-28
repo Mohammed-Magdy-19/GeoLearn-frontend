@@ -19,6 +19,7 @@ interface ModuleFormModalProps {
   onClose: () => void;
   onSubmit: (data: ModulePayload) => void;
   initialData?: AdminModule | null;
+  isSubmitting?: boolean;
 }
 
 const ModuleFormModal: React.FC<ModuleFormModalProps> = ({
@@ -27,6 +28,7 @@ const ModuleFormModal: React.FC<ModuleFormModalProps> = ({
   onClose,
   onSubmit,
   initialData,
+  isSubmitting = false,
 }) => {
   const { t } = useTranslation();
   const [title, setTitle] = useState("");
@@ -83,13 +85,17 @@ const ModuleFormModal: React.FC<ModuleFormModalProps> = ({
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
               {t('common.cancel')}
             </Button>
             <Button
               type="submit"
-              className="bg-brand-primary hover:bg-brand-primary/90 text-white font-medium shadow-brand"
+              disabled={isSubmitting}
+              className="bg-brand-primary hover:bg-brand-primary/90 text-white font-medium shadow-brand disabled:opacity-60 disabled:cursor-not-allowed gap-2"
             >
+              {isSubmitting && (
+                <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              )}
               {initialData ? t('dashboard.saveChanges') : t('dashboard.addModule')}
             </Button>
           </DialogFooter>

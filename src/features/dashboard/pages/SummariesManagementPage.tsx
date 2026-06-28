@@ -30,6 +30,7 @@ export const SummariesManagementPage = () => {
     handleCloseForm,
     handleSaveSummary,
     handleDeleteSummary,
+    isMutating,
   } = useSummariesHandlers();
 
   const summaries = data?.results ?? [];
@@ -123,6 +124,7 @@ export const SummariesManagementPage = () => {
         onClose={handleCloseForm}
         onSubmit={handleSaveSummary}
         initialData={editingSummary}
+        isSubmitting={isMutating}
       />
     </div>
   );

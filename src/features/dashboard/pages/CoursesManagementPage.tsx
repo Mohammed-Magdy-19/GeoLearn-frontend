@@ -68,6 +68,7 @@ export const CoursesManagementPage = () => {
     handleDeleteModule,
     handleDeleteLesson,
     handleDeleteVideo,
+    isMutating,
   } = useCoursesHandlers();
 
   return (
@@ -129,6 +130,7 @@ export const CoursesManagementPage = () => {
         }}
         onSubmit={handleCreateCourse}
         initialData={editingCourse}
+        isSubmitting={isMutating}
       />
 
       {/* Module Form Modal */}
@@ -141,6 +143,7 @@ export const CoursesManagementPage = () => {
         }}
         onSubmit={handleSaveModule}
         initialData={editingModule}
+        isSubmitting={isMutating}
       />
 
       {/* Lesson Form Modal (includes video upload + auto-duration sync) */}
@@ -154,6 +157,7 @@ export const CoursesManagementPage = () => {
         }}
         onSubmit={handleSaveLesson}
         initialData={editingLesson}
+        isSubmitting={isMutating}
       />
     </div>
   );

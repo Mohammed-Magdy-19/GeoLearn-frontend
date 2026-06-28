@@ -17,9 +17,10 @@ interface Props {
   onClose: () => void;
   onSubmit: (payload: MetadataPayload) => void;
   initialData: AdminMetadataEntry | null;
+  isSubmitting?: boolean;
 }
 
-const MetadataFormModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, initialData }) => {
+const MetadataFormModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, initialData, isSubmitting = false }) => {
   const { t } = useTranslation();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -122,8 +123,17 @@ const MetadataFormModal: React.FC<Props> = ({ isOpen, onClose, onSubmit, initial
             <Switch id="meta-published" checked={isPublished} onCheckedChange={setIsPublished} />
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>{t('common.cancel')}</Button>
-            <Button type="submit" className="bg-brand-primary hover:bg-brand-primary/90 text-white font-bold" disabled={!title}>{initialData ? t('dashboard.update') : t('dashboard.create')}</Button>
+            <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>{t('common.cancel')}</Button>
+            <Button
+              type="submit"
+              disabled={isSubmitting || !title}
+              className="bg-brand-primary hover:bg-brand-primary/90 text-white font-bold disabled:opacity-60 disabled:cursor-not-allowed gap-2"
+            >
+              {isSubmitting && (
+                <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              )}
+              {initialData ? t('dashboard.update') : t('dashboard.create')}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

@@ -19,6 +19,7 @@ interface CourseFormModalProps {
   onClose: () => void;
   onSubmit: (data: CoursePayload) => void;
   initialData?: AdminCourse | null;
+  isSubmitting?: boolean;
 }
 
 const CourseFormModal: React.FC<CourseFormModalProps> = ({
@@ -26,6 +27,7 @@ const CourseFormModal: React.FC<CourseFormModalProps> = ({
   onClose,
   onSubmit,
   initialData,
+  isSubmitting = false,
 }) => {
   const { t } = useTranslation();
   const [formData, setFormData] = useState<CoursePayload>({
@@ -152,13 +154,17 @@ const CourseFormModal: React.FC<CourseFormModalProps> = ({
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
               {t('common.cancel')}
             </Button>
             <Button
               type="submit"
-              className="bg-brand-primary hover:bg-brand-primary/90 text-white font-medium shadow-brand"
+              disabled={isSubmitting}
+              className="bg-brand-primary hover:bg-brand-primary/90 text-white font-medium shadow-brand disabled:opacity-60 disabled:cursor-not-allowed gap-2"
             >
+              {isSubmitting && (
+                <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              )}
               {initialData ? t('dashboard.saveChanges') : t('dashboard.createCourse')}
             </Button>
           </DialogFooter>

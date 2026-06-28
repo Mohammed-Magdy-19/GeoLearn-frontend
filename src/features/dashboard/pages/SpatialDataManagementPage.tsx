@@ -16,7 +16,7 @@ export const SpatialDataManagementPage = () => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const { data, isLoading } = useAdminSpatialData(page, search);
-  const { editingEntry, isFormOpen, handleOpenCreate, handleOpenEdit, handleCloseForm, handleSave, handleDelete } = useSpatialDataHandlers();
+  const { editingEntry, isFormOpen, handleOpenCreate, handleOpenEdit, handleCloseForm, handleSave, handleDelete, isMutating } = useSpatialDataHandlers();
 
   const entries = data?.results ?? [];
   const totalCount = data?.count ?? 0;
@@ -64,7 +64,7 @@ export const SpatialDataManagementPage = () => {
           )}
         </>
       )}
-      <SpatialDataFormModal isOpen={isFormOpen} onClose={handleCloseForm} onSubmit={handleSave} initialData={editingEntry} />
+      <SpatialDataFormModal isOpen={isFormOpen} onClose={handleCloseForm} onSubmit={handleSave} initialData={editingEntry} isSubmitting={isMutating} />
     </div>
   );
 };
