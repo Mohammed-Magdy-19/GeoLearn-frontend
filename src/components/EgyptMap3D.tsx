@@ -14,6 +14,21 @@
  *   8. Antialiasing disabled for mobile perf
  */
 
+// Suppress THREE.Clock deprecation warning triggered internally by React Three Fiber
+if (typeof window !== "undefined") {
+  const originalWarn = console.warn;
+  console.warn = (...args) => {
+    if (
+      args[0] &&
+      typeof args[0] === "string" &&
+      args[0].includes("THREE.Clock: This module has been deprecated")
+    ) {
+      return;
+    }
+    originalWarn(...args);
+  };
+}
+
 import { useRef, useMemo, useState, useEffect, useCallback, startTransition } from "react";
 import { Canvas, useFrame, useThree, invalidate } from "@react-three/fiber";
 import { OrthographicCamera } from "@react-three/drei";
@@ -150,6 +165,14 @@ function ThemedGlobeMesh({ polygons, colorOcean, colorLand }: {
     invalidate();
   }, [colorOcean, colorLand, geometry, landMask]);
 
+  // Clean up WebGL resources for geometry when it is recreated or unmounted to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      geometry.dispose();
+    };
+  }, [geometry]);
+
+
   return (
     <mesh ref={meshRef} geometry={geometry}>
       <meshStandardMaterial
@@ -165,14 +188,9 @@ function ThemedGlobeMesh({ polygons, colorOcean, colorLand }: {
 // ─── Grid Lines ──────────────────────────────────────────────────────────
 
 function GridLines({ colorGrid }: { colorGrid: string }) {
-  const lineObjects = useMemo(() => {
-    const result: THREE.Line[] = [];
+  const linesPoints = useMemo(() => {
+    const result: THREE.Vector3[][] = [];
     const r = GLOBE_RADIUS + 0.012;
-    const material = new THREE.LineBasicMaterial({
-      color: colorGrid,
-      transparent: true,
-      opacity: 0.35,
-    });
 
     // Parallels every 30° (was 15° — halved line count)
     for (let lat = -60; lat <= 60; lat += 30) {
@@ -188,7 +206,7 @@ function GridLines({ colorGrid }: { colorGrid: string }) {
           )
         );
       }
-      result.push(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), material));
+      result.push(pts);
     }
 
     // Meridians every 30° (was 15°)
@@ -205,16 +223,24 @@ function GridLines({ colorGrid }: { colorGrid: string }) {
           )
         );
       }
-      result.push(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), material));
+      result.push(pts);
     }
 
     return result;
-  }, [colorGrid]);
+  }, []);
 
   return (
     <>
-      {lineObjects.map((obj, i) => (
-        <primitive key={i} object={obj} />
+      {linesPoints.map((pts, i) => (
+        <line key={i}>
+          <bufferGeometry attach="geometry" onUpdate={(self) => self.setFromPoints(pts)} />
+          <lineBasicMaterial
+            attach="material"
+            color={colorGrid}
+            transparent
+            opacity={0.35}
+          />
+        </line>
       ))}
     </>
   );
