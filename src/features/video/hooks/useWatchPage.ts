@@ -10,21 +10,25 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useVideoStore } from './useVideoStore';
 import { useEnrollmentStatus } from '@/features/courses/hooks/useCourseData';
 import { useAuthStore } from '@/store/useAuthStore';
 import api, { fetchLessonDetail } from '@/services/api';
 import type { CourseDetail, LessonDetail, LessonAccessConfig } from '../types';
+import { useProgressReport } from './useVideoData';
 
 export function useWatchPage() {
     const { slug, lessonId } = useParams<{ slug: string; lessonId: string }>();
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
     const [selectedLessonId, setSelectedLessonId] = useState<string | null>(lessonId || null);
 
     const resetPlayback = useVideoStore((state) => state.resetPlayback);
     const setVideo = useVideoStore((state) => state.setVideo);
+
+    const { mutate: reportProgress } = useProgressReport(slug!);
 
     // ── Data Fetching ──────────────────────────────────────
 
@@ -151,10 +155,46 @@ export function useWatchPage() {
     }, [selectedLessonId, allLessons]);
 
     const handleNextLesson = useCallback(() => {
+        if (currentLesson && !currentLesson.progress?.is_completed) {
+            const duration = currentLesson.duration_seconds || 1;
+
+            // 1. Optimistically update ['course', slug] query cache
+            const courseQueryKey = ['course', slug];
+            const previousCourse = queryClient.getQueryData<CourseDetail>(courseQueryKey);
+            if (previousCourse) {
+                const updatedModules = previousCourse.modules.map((m) => {
+                    const updatedLessons = m.lessons.map((l) => {
+                        if (l.id === currentLesson.id) {
+                            return {
+                                ...l,
+                                progress: {
+                                    last_watched_second: duration,
+                                    is_completed: true,
+                                },
+                            };
+                        }
+                        return l;
+                    });
+                    return { ...m, lessons: updatedLessons };
+                });
+                queryClient.setQueryData<CourseDetail>(courseQueryKey, {
+                    ...previousCourse,
+                    modules: updatedModules,
+                });
+            }
+
+            // 2. Report progress to server
+            reportProgress({
+                lesson_id: currentLesson.id,
+                last_watched_second: duration,
+            });
+        }
+
+        // 3. Navigate/load the next lesson
         if (nextLesson) {
             handleLessonSelect(nextLesson.id);
         }
-    }, [nextLesson, handleLessonSelect]);
+    }, [slug, currentLesson, nextLesson, handleLessonSelect, reportProgress, queryClient]);
 
     return {
         // Data
