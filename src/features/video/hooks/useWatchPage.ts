@@ -167,6 +167,8 @@ export function useWatchPage() {
                         if (l.id === currentLesson.id) {
                             return {
                                 ...l,
+                                is_completed: true,
+                                last_watched_second: duration,
                                 progress: {
                                     last_watched_second: duration,
                                     is_completed: true,
