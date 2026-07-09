@@ -4,12 +4,9 @@
 //
 // Deters screen recording by displaying real-time session parameters.
 // All position/timing logic extracted to useWatermark hook.
-//
-// DIP: reads currentTime from Vidstack context (useMediaState).
-//      Username + email are injected via props — no direct store access.
 // ─────────────────────────────────────────────────────────────
 
-import { useMediaState } from '@vidstack/react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useWatermark } from '../hooks/useWatermark';
 
@@ -18,6 +15,8 @@ interface DynamicWatermarkProps {
     username?: string;
     /** User email — will be partially masked for privacy. */
     email?: string;
+    /** Raw HTMLVideoElement to read currentTime from */
+    video: HTMLVideoElement | null;
 }
 
 /**
@@ -31,12 +30,24 @@ function maskEmail(email: string): string {
     return `${local[0]}***@${domain}`;
 }
 
-export function DynamicWatermark({ username = 'ANONYMOUS', email = '' }: DynamicWatermarkProps) {
+export function DynamicWatermark({ username = 'ANONYMOUS', email = '', video }: DynamicWatermarkProps) {
     const { t } = useTranslation();
     const { position, isVisible, formatTime } = useWatermark();
+    const [currentTime, setCurrentTime] = useState(0);
 
-    // Read currentTime from Vidstack context (DIP — no Zustand dependency)
-    const currentTime = useMediaState('currentTime');
+    // Sync current time from the raw HTMLVideoElement event listener
+    useEffect(() => {
+        if (!video) return;
+
+        const handleTimeUpdate = () => {
+            setCurrentTime(video.currentTime);
+        };
+
+        video.addEventListener('timeupdate', handleTimeUpdate);
+        return () => {
+            video.removeEventListener('timeupdate', handleTimeUpdate);
+        };
+    }, [video]);
 
     const maskedEmail = maskEmail(email);
 

@@ -7,7 +7,6 @@
 // Components
 export { SecureVideoPlayer } from './components/SecureVideoPlayer';
 export { DynamicWatermark } from './components/DynamicWatermark';
-export { VideoControls } from './components/VideoControls';
 export { LessonSidebar } from './components/LessonSidebar';
 export { VideoPlayerSkeleton } from './components/VideoPlayerSkeleton';
 export { PlayerLoadingState } from './components/PlayerLoadingState';

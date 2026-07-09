@@ -5,32 +5,21 @@
 // This component ONLY handles rendering. All state management,
 // bidirectional sync, security wiring, and progress tracking
 // live in useSecurePlayer (DIP — depends on the abstraction).
-//
-// Security layers (inside → outside):
-//   1. <MediaProvider>         — plays the blob URL
-//   2. <MediaElSecurity>       — DOM-level video element hardening
-//   3. <CanvasShield>          — invisible forensic canvas overlay
-//   4. <DynamicWatermark>      — visible moving watermark
-//   5. <VideoControls>         — custom player controls
-//   6. <ScreenshotWarning>     — temporary warning overlay
-//   7. Container blur filter   — harsh blur(60px) when hidden
-//
-// OCP: accepts `overlaySlot` + `children` for extension.
-// ISP: only consumes what it renders.
 // ─────────────────────────────────────────────────────────────
 
-import type { ReactNode } from 'react';
-import { MediaPlayer, MediaProvider } from '@vidstack/react';
+import { type ReactNode, useMemo } from 'react';
 import { ShieldAlert } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useSecurePlayer } from '../hooks/useSecurePlayer';
 import { DynamicWatermark } from './DynamicWatermark';
-import { VideoControls } from './VideoControls';
 import { MediaElSecurity } from './MediaElSecurity';
 import { CanvasShield } from './CanvasShield';
 import { PlayerLoadingState } from './PlayerLoadingState';
 import { PlayerErrorState } from './PlayerErrorState';
 import { PlayerEmptyState } from './PlayerEmptyState';
+import { VideoControls } from './VideoControls';
+import { Plyr } from 'plyr-react';
+import '../plyr-theme.css';
 
 // ── Props (ISP — only primitives the caller has) ─────────────
 
@@ -70,21 +59,37 @@ export function SecureVideoPlayer({
         retry,
         isTabHidden,
         screenshotWarning,
-        volume,
-        isMuted,
-        playbackRate,
         securityHandlers,
-        handleCanPlay,
-        handleVolumeChange,
-        handleRateChange,
-        handlePlay,
-        handlePause,
-        handleEnd,
+        videoEl,
         username,
         userEmail,
     } = useSecurePlayer({ videoId, lessonId, courseSlug, sessionToken });
 
     const displayTitle = meta?.title || title || 'Secure Media Stream';
+
+    // Memoize options to make Plyr headless so we can render our custom controls overlay
+    const plyrOptions = useMemo(() => ({
+        controls: [], // Completely hide native controls
+        settings: [], // Hide native settings
+        keyboard: { global: false, focused: false }, // Let custom React overlay handle controls
+        tooltips: { controls: false, seek: false },
+        clickToPlay: false, // Let React double-tap/single-tap handle clicks
+    }), []);
+
+    // Memoize video source object to prevent unnecessary player re-renders
+    const plyrSource = useMemo(() => {
+        if (!secureSrc) return null;
+        return {
+            type: 'video' as const,
+            title: displayTitle,
+            sources: [
+                {
+                    src: secureSrc,
+                    type: 'video/mp4',
+                },
+            ],
+        };
+    }, [secureSrc, displayTitle]);
 
     // ── Render: loading ─────────────────────────────────────────
 
@@ -102,30 +107,10 @@ export function SecureVideoPlayer({
         return <PlayerEmptyState title={title} />;
     }
 
-    // ── Render: Vidstack player ─────────────────────────────────
+    // ── Render: Plyr player with Custom Event-driven Controls ──
 
     return (
-        <MediaPlayer
-            ref={playerRef}
-            src={{ src: secureSrc, type: 'video/mp4' }}
-            title={displayTitle}
-            playsInline
-            onCanPlay={handleCanPlay}
-            onVolumeChange={(event) => {
-                // Vidstack MediaVolumeChange exposes volume/muted directly
-                const vol = (event as unknown as Record<string, unknown>)?.volume ?? volume;
-                const mut = (event as unknown as Record<string, unknown>)?.muted ?? isMuted;
-                handleVolumeChange({ volume: vol as number, muted: mut as boolean });
-            }}
-            onRateChange={(event) => {
-                // Vidstack may pass the rate directly or nested
-                const raw = event as unknown;
-                const rate = typeof raw === 'number' ? raw : ((raw as Record<string, unknown>)?.rate ?? playbackRate);
-                handleRateChange({ rate: typeof rate === 'number' ? rate : playbackRate });
-            }}
-            onPlay={handlePlay}
-            onPause={handlePause}
-            onEnd={handleEnd}
+        <div
             className={[
                 'relative aspect-video w-full overflow-hidden rounded-2xl',
                 'bg-black select-none group border border-neutral-800 shadow-card',
@@ -141,10 +126,19 @@ export function SecureVideoPlayer({
             onDragStart={securityHandlers.onDragStart}
             draggable={false}
         >
-            <MediaProvider />
+            {plyrSource && (
+                <Plyr
+                    ref={playerRef}
+                    source={plyrSource}
+                    options={plyrOptions}
+                />
+            )}
+
+            {/* Custom responsive controller overlay */}
+            <VideoControls video={videoEl} plyr={playerRef.current?.plyr} />
 
             {/* DOM-level security on the internal <video> element */}
-            <MediaElSecurity />
+            <MediaElSecurity video={videoEl} />
 
             {/* Canvas anti-screenshot shield — near-invisible forensic overlay */}
             <CanvasShield
@@ -154,10 +148,7 @@ export function SecureVideoPlayer({
             />
 
             {/* Moving forensic watermark with email */}
-            <DynamicWatermark username={username} email={userEmail} />
-
-            {/* Custom controls */}
-            <VideoControls />
+            <DynamicWatermark username={username} email={userEmail} video={videoEl} />
 
             {/* Screenshot warning overlay — auto-fades after 3s */}
             {screenshotWarning && <ScreenshotWarning />}
@@ -173,7 +164,7 @@ export function SecureVideoPlayer({
 
             {/* Title badge — hover-visible */}
             <TitleBadge title={displayTitle} />
-        </MediaPlayer>
+        </div>
     );
 }
 

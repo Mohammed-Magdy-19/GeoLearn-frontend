@@ -1,0 +1,42 @@
+/* src/features/video/plyr-theme.css */
+@import 'plyr/dist/plyr.css';
+
+.plyr {
+  --plyr-color-main: #D45B34;
+  --plyr-video-background: #000000;
+  --plyr-control-radius: 12px;
+  --plyr-font-family: inherit;
+  --plyr-tooltip-background: rgba(10, 10, 10, 0.95);
+  --plyr-tooltip-color: #ffffff;
+  --plyr-tooltip-radius: 8px;
+  
+  border-radius: 1rem; /* 16px to match rounded-2xl */
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+/* Hide native controls, click-to-play layers, and overlay play button */
+.plyr__controls,
+.plyr__control--overlaid,
+.plyr__video-wrapper::after,
+.plyr__click-to-play {
+  display: none !important;
+}
+
+/* Fullscreen styling for custom player wrapper container to support overlay controls */
+.relative.aspect-video:fullscreen {
+  aspect-ratio: auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0px !important;
+  border: none !important;
+}
+
+.relative.aspect-video:-webkit-full-screen {
+  aspect-ratio: auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0px !important;
+  border: none !important;
+}

@@ -3,24 +3,18 @@
 // Secure Player Orchestration Hook (SRP)
 //
 // Single responsibility: wire all sub-hooks and bidirectional
-// Vidstack ↔ Zustand state sync into a clean return interface
+// Plyr ↔ Zustand state sync into a clean return interface
 // that SecureVideoPlayer can consume without knowing internals.
-//
-// This is the ONLY hook that touches useVideoStore, useVideoData,
-// useSecureVideoPlayer, usePlayerSecurity, and useProgressTracker.
-// The presentation component depends on this abstraction (DIP).
 // ─────────────────────────────────────────────────────────────
 
 import { useRef, useState, useEffect, useCallback } from 'react';
-import type { MediaPlayerInstance } from '@vidstack/react';
+import type { APITypes } from 'plyr-react';
 import { useVideoStore } from './useVideoStore';
 import { useVideoData } from './useVideoData';
 import { useSecureVideoPlayer } from './useSecureVideoPlayer';
 import { useProgressTracker } from './useProgressTracker';
 import { useAuthStore } from '@/store/useAuthStore';
-import {
-    usePlayerSecurity,
-} from './usePlayerSecurity';
+import { usePlayerSecurity } from './usePlayerSecurity';
 
 // ── Props (ISP — callers only pass what they have) ───────────
 
@@ -35,9 +29,9 @@ interface UseSecurePlayerProps {
 // ── Return type ──────────────────────────────────────────────
 
 export interface SecurePlayerState {
-    /** Ref to attach to <MediaPlayer> */
-    playerRef: React.RefObject<MediaPlayerInstance | null>;
-    /** Blob URL for Vidstack src */
+    /** Ref to attach to <Plyr> */
+    playerRef: React.RefObject<APITypes | null>;
+    /** Blob URL for Plyr src */
     secureSrc: string | null;
     /** Video metadata (title, duration, etc.) */
     meta: { title?: string; duration_seconds?: number } | undefined;
@@ -62,18 +56,8 @@ export interface SecurePlayerState {
         onContextMenu?: (e: React.MouseEvent) => void;
         onDragStart?: (e: React.DragEvent) => void;
     };
-    /** Callback for Vidstack's onCanPlay — syncs persisted settings */
-    handleCanPlay: () => void;
-    /** Callback for Vidstack's onVolumeChange */
-    handleVolumeChange: (detail: { volume: number; muted: boolean }) => void;
-    /** Callback for Vidstack's onRateChange */
-    handleRateChange: (detail: { rate: number }) => void;
-    /** Callback for Vidstack's onPlay */
-    handlePlay: () => void;
-    /** Callback for Vidstack's onPause */
-    handlePause: () => void;
-    /** Callback for Vidstack's onEnd */
-    handleEnd: () => void;
+    /** Raw HTMLVideoElement from Plyr */
+    videoEl: HTMLVideoElement | null;
     /** Current user's display name for watermark */
     username: string;
     /** Current user's email (partially masked) for watermark */
@@ -88,7 +72,7 @@ export function useSecurePlayer({
     courseSlug,
     sessionToken,
 }: UseSecurePlayerProps): SecurePlayerState {
-    const playerRef = useRef<MediaPlayerInstance>(null);
+    const playerRef = useRef<APITypes>(null);
 
     // ── Tab visibility overlay ────────────────────────────────
 
@@ -142,57 +126,26 @@ export function useSecurePlayer({
 
     // ── Auto-pause on screenshot detection only ─────────────────
     // Pause the player when a screenshot is actively detected.
-    // Window blur (1s) does NOT pause — just visual blur.
 
     useEffect(() => {
         if (screenshotWarning) {
             try {
-                playerRef.current?.pause();
+                playerRef.current?.plyr?.pause();
             } catch {
                 // Player may be disposed during unmount
             }
         }
     }, [screenshotWarning]);
 
-    // ── Bidirectional Zustand ↔ Vidstack sync ─────────────────
-
-    const handleCanPlay = useCallback(() => {
-        const player = playerRef.current;
-        if (!player) return;
-        player.volume = volume;
-        player.muted = isMuted;
-        player.playbackRate = playbackRate;
-    }, [volume, isMuted, playbackRate]);
-
-    const handleVolumeChange = useCallback(
-        (detail: { volume: number; muted: boolean }) => {
-            setVolume(detail.volume);
-            if (detail.muted !== isMuted) toggleMute();
-        },
-        [setVolume, isMuted, toggleMute]
-    );
-
-    const handleRateChange = useCallback(
-        (detail: { rate: number }) => {
-            setPlaybackRate(detail.rate);
-        },
-        [setPlaybackRate]
-    );
-
     // ── Play state for progress tracking ──────────────────────
 
     const [isPlaying, setIsPlaying] = useState(false);
 
-    const handlePlay = useCallback(() => setIsPlaying(true), []);
-    const handlePause = useCallback(() => setIsPlaying(false), []);
-
     const getCurrentTime = useCallback(
         () => {
             try {
-                return playerRef.current?.currentTime ?? 0;
+                return playerRef.current?.plyr?.currentTime ?? 0;
             } catch {
-                // Vidstack player may be disposed during unmount/navigation,
-                // causing internal getters to throw on null state.
                 return 0;
             }
         },
@@ -207,12 +160,83 @@ export function useSecurePlayer({
         getCurrentTime,
     });
 
-    // When the video ends, send a forced final progress report
-    // to guarantee the backend marks the lesson as completed.
-    const handleEnd = useCallback(() => {
-        setIsPlaying(false);
-        sendFinalProgress();
-    }, [sendFinalProgress]);
+    // ── Plyr instance tracking and event sync ──────────────────
+
+    const [plyrInstance, setPlyrInstance] = useState<any>(null);
+    const hasInitializedRef = useRef(false);
+
+    useEffect(() => {
+        hasInitializedRef.current = false;
+        setPlyrInstance(null);
+    }, [secureSrc]);
+
+    useEffect(() => {
+        const checkInstance = () => {
+            const plyr = playerRef.current?.plyr;
+            if (plyr && typeof plyr.on === 'function' && plyr !== plyrInstance) {
+                setPlyrInstance(plyr);
+            }
+        };
+
+        checkInstance();
+        const timer = setInterval(checkInstance, 200);
+        return () => clearInterval(timer);
+    }, [plyrInstance, secureSrc]);
+
+    useEffect(() => {
+        if (!plyrInstance) return;
+
+        // Apply initial volume/muted/playbackRate once on ready
+        if (!hasInitializedRef.current) {
+            plyrInstance.volume = volume;
+            plyrInstance.muted = isMuted;
+            plyrInstance.speed = playbackRate;
+            hasInitializedRef.current = true;
+        }
+
+        const onPlay = () => setIsPlaying(true);
+        const onPause = () => setIsPlaying(false);
+        const onEnded = () => {
+            setIsPlaying(false);
+            sendFinalProgress();
+        };
+        const onVolumeChange = () => {
+            setVolume(plyrInstance.volume);
+            if (plyrInstance.muted !== isMuted) {
+                toggleMute();
+            }
+        };
+        const onRateChange = () => {
+            setPlaybackRate(plyrInstance.speed);
+        };
+
+        // Attach listeners
+        plyrInstance.on('play', onPlay);
+        plyrInstance.on('pause', onPause);
+        plyrInstance.on('ended', onEnded);
+        plyrInstance.on('volumechange', onVolumeChange);
+        plyrInstance.on('ratechange', onRateChange);
+
+        return () => {
+            plyrInstance.off('play', onPlay);
+            plyrInstance.off('pause', onPause);
+            plyrInstance.off('ended', onEnded);
+            plyrInstance.off('volumechange', onVolumeChange);
+            plyrInstance.off('ratechange', onRateChange);
+        };
+    }, [
+        plyrInstance,
+        isMuted,
+        volume,
+        playbackRate,
+        setVolume,
+        toggleMute,
+        setPlaybackRate,
+        sendFinalProgress
+    ]);
+
+    // Expose raw HTMLVideoElement for DOM-level hardening
+    const videoEl = plyrInstance?.media ?? null;
 
     // ── Return ────────────────────────────────────────────────
 
@@ -229,12 +253,7 @@ export function useSecurePlayer({
         isMuted,
         playbackRate,
         securityHandlers: { onContextMenu, onDragStart },
-        handleCanPlay,
-        handleVolumeChange,
-        handleRateChange,
-        handlePlay,
-        handlePause,
-        handleEnd,
+        videoEl,
         username,
         userEmail,
     };
