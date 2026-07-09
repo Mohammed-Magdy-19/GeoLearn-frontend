@@ -55,18 +55,19 @@ export function DynamicWatermark({ username = 'ANONYMOUS', email = '', video }: 
         <>
             {/* Moving watermark — teleports randomly every 3-4 seconds */}
             <div
+                dir="ltr"
                 style={{
                     top: position.top,
                     left: position.left,
                     opacity: isVisible ? 0.15 : 0,
                     transition: 'all 0.7s ease-in-out, opacity 0.2s ease',
                 }}
-                className="absolute pointer-events-none select-none z-50 font-mono text-[10px] text-white bg-black/40 px-2 py-1 rounded tracking-widest backdrop-blur-sm"
+                className="absolute pointer-events-none select-none z-50 font-mono text-[10px] text-white bg-black/40 px-2 py-1 rounded tracking-widest backdrop-blur-sm text-left"
             >
-                <div className="flex flex-col gap-0.5">
-                    <span className="font-semibold">{username}</span>
+                <div className="flex flex-col gap-0.5 items-start text-left">
+                    <span className="font-semibold normal-case">{username}</span>
                     {maskedEmail && (
-                        <span className="text-[8px] opacity-90">{maskedEmail}</span>
+                        <span className="text-[8px] opacity-90 normal-case">{maskedEmail}</span>
                     )}
                     <span className="text-[8px] opacity-80">
                         {formatTime(currentTime)}
