@@ -10,30 +10,29 @@ import { useVideoControlsStore } from '../hooks/useVideoControlsStore';
 
 interface VolumeControlProps {
     video: HTMLVideoElement | null;
+    setVideoVolume: (val: number) => void;
+    setVideoMuted: (muted: boolean) => void;
 }
 
-export const VolumeControl = React.memo(function VolumeControl({ video }: VolumeControlProps) {
+export const VolumeControl = React.memo(function VolumeControl({
+    video,
+    setVideoVolume,
+    setVideoMuted,
+}: VolumeControlProps) {
     const volume = useVideoControlsStore((s) => s.volume);
     const isMuted = useVideoControlsStore((s) => s.isMuted);
-    const setVolume = useVideoControlsStore((s) => s.setVolume);
-    const setMuted = useVideoControlsStore((s) => s.setMuted);
 
     const [isVolumeHovered, setIsVolumeHovered] = useState(false);
 
     const handleVolumeToggle = () => {
         if (!video) return;
-        const newMuteState = !isMuted;
-        video.muted = newMuteState;
-        setMuted(newMuteState);
+        setVideoMuted(!isMuted);
     };
 
     const handleVolumeSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!video) return;
         const val = parseFloat(e.target.value);
-        video.volume = val;
-        video.muted = val === 0;
-        setVolume(val);
-        setMuted(val === 0);
+        setVideoVolume(val);
     };
 
     const VolumeIcon = isMuted || volume === 0

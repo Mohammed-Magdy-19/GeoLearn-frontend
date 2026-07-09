@@ -111,6 +111,7 @@ export function SecureVideoPlayer({
 
     return (
         <div
+            data-video-container
             className={[
                 'relative aspect-video w-full overflow-hidden rounded-2xl',
                 'bg-black select-none group border border-neutral-800 shadow-card',

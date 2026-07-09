@@ -2,6 +2,11 @@
 // ─────────────────────────────────────────────────────────────
 // SettingsMenu Component — Memoized Subcomponent (Performance #3)
 // Handles nested menu states, focus trapping, and quality/speed toggles.
+//
+// Changelog:
+//   • B5 fix: Escape is owned exclusively here — VideoControls keyboard hook no longer handles it.
+//   • B8 fix: Auto-focuses first menu item when menu opens for keyboard accessibility.
+//   • MinimalPlyr is defined here and re-exported from types/video-controls.types.ts.
 // ─────────────────────────────────────────────────────────────
 
 import React, { useEffect, useRef } from 'react';
@@ -48,6 +53,7 @@ export const SettingsMenu = React.memo(function SettingsMenu({
     // Trap focus inside settings menu (Accessibility #3)
     useEffect(() => {
         if (!isSettingsOpen) return;
+        if (settingsRef.current && settingsRef.current.offsetParent === null) return;
 
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
@@ -85,6 +91,10 @@ export const SettingsMenu = React.memo(function SettingsMenu({
     useEffect(() => {
         if (!isSettingsOpen) return;
         const handleOutsideClick = (e: MouseEvent) => {
+            // Ignore outside clicks if this menu is hidden in the current viewport/layout
+            if (settingsRef.current && settingsRef.current.offsetParent === null) {
+                return;
+            }
             if (settingsRef.current && !settingsRef.current.contains(e.target as Node)) {
                 setSettingsOpen(false);
             }
@@ -93,9 +103,26 @@ export const SettingsMenu = React.memo(function SettingsMenu({
         return () => document.removeEventListener('mousedown', handleOutsideClick);
     }, [isSettingsOpen, setSettingsOpen]);
 
+    // Auto-focus the first focusable element when menu opens (Accessibility B8 fix)
+    useEffect(() => {
+        if (!isSettingsOpen || !settingsRef.current) return;
+        if (settingsRef.current.offsetParent === null) return;
+        // Use rAF to wait for the DOM to paint the menu panel before querying
+        const rafId = requestAnimationFrame(() => {
+            const firstFocusable = settingsRef.current?.querySelector<HTMLElement>(
+                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            );
+            firstFocusable?.focus();
+        });
+        return () => cancelAnimationFrame(rafId);
+    }, [isSettingsOpen, settingsMenu]);
+
     // Return focus to the trigger button when closed (Accessibility #3)
     const prevOpenRef = useRef(isSettingsOpen);
     useEffect(() => {
+        if (settingsRef.current && settingsRef.current.offsetParent === null) {
+            return;
+        }
         if (prevOpenRef.current && !isSettingsOpen) {
             triggerRef.current?.focus();
         }

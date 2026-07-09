@@ -6,6 +6,7 @@
 
 import React, { useCallback, useRef } from 'react';
 import { cn } from '@/lib/utils';
+import { formatTime } from '../utils/formatTime';
 
 interface ProgressBarProps {
     video: HTMLVideoElement | null;
@@ -26,24 +27,6 @@ export const ProgressBar = React.memo(function ProgressBar({
 }: ProgressBarProps) {
     const isDraggingRef = useRef(false);
 
-    // Helpers to format time
-    const formatTime = (seconds: number): string => {
-        if (isNaN(seconds) || seconds === Infinity) return '00:00';
-        const hrs = Math.floor(seconds / 3600);
-        const mins = Math.floor((seconds % 3600) / 60);
-        const secs = Math.floor(seconds % 60);
-        if (hrs > 0) {
-            return [
-                hrs.toString().padStart(2, '0'),
-                mins.toString().padStart(2, '0'),
-                secs.toString().padStart(2, '0'),
-            ].join(':');
-        }
-        return [
-            mins.toString().padStart(2, '0'),
-            secs.toString().padStart(2, '0'),
-        ].join(':');
-    };
 
     // Calculate percentage from coordinate
     const getPercentFromEvent = useCallback((e: MouseEvent | TouchEvent | React.MouseEvent | React.TouchEvent, element: HTMLDivElement): number => {
