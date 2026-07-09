@@ -261,12 +261,21 @@ export function VideoControls({ video, plyr, sources, onQualityChange }: VideoCo
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             const activeEl = document.activeElement;
+            
+            // Ignore global keys when focusing inputs, buttons, sliders, or selection dropdowns
             if (
                 activeEl &&
                 (activeEl.tagName === 'INPUT' ||
                     activeEl.tagName === 'TEXTAREA' ||
+                    activeEl.tagName === 'BUTTON' ||
+                    activeEl.tagName === 'SELECT' ||
                     activeEl.hasAttribute('contenteditable'))
             ) {
+                return;
+            }
+
+            // Ignore global hotkeys (except Escape) if the settings menu is open to prevent key hijacking
+            if (isSettingsOpen && e.key !== 'Escape') {
                 return;
             }
 
@@ -338,6 +347,13 @@ export function VideoControls({ video, plyr, sources, onQualityChange }: VideoCo
             if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
         };
     }, [resetHideTimeout, isPlaying]);
+
+    // Reset controls state store on unmount
+    useEffect(() => {
+        return () => {
+            useVideoControlsStore.getState().resetStore();
+        };
+    }, []);
 
     // Handle single tap inside center overlay to toggle play (Bugs #3)
     const handleCenterOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {

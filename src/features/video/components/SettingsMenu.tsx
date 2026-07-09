@@ -161,7 +161,10 @@ export const SettingsMenu = React.memo(function SettingsMenu({
             <button
                 ref={triggerRef}
                 type="button"
-                onClick={() => setSettingsOpen(!isSettingsOpen)}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setSettingsOpen(!isSettingsOpen);
+                }}
                 className="p-1.5 text-white hover:bg-white/10 rounded-xl transition-all"
                 aria-label="Settings"
                 aria-haspopup="true"
@@ -172,7 +175,7 @@ export const SettingsMenu = React.memo(function SettingsMenu({
 
             {isSettingsOpen && (
                 <div
-                    className="absolute right-0 bottom-12 w-56 max-h-72 overflow-y-auto bg-neutral-950/95 border border-neutral-800 rounded-2xl p-1 z-[70] shadow-2xl pointer-events-auto backdrop-blur-md animate-in fade-in-0 slide-in-from-bottom-2 duration-150 scrollbar-hide text-white"
+                    className="absolute right-0 bottom-auto sm:bottom-12 top-12 sm:top-auto w-56 max-h-72 overflow-y-auto bg-neutral-950/95 border border-neutral-800 rounded-2xl p-1 z-[70] shadow-2xl pointer-events-auto backdrop-blur-md animate-in fade-in-0 slide-in-from-bottom-2 duration-150 scrollbar-hide text-white"
                     role="menu"
                 >
                     {/* Main Settings Menu */}
@@ -185,7 +188,10 @@ export const SettingsMenu = React.memo(function SettingsMenu({
                             {/* Playback Speed Menu trigger */}
                             <button
                                 type="button"
-                                onClick={() => setSettingsMenu('speed')}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSettingsMenu('speed');
+                                }}
                                 className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-white/10 transition-colors text-left"
                                 role="menuitem"
                             >
@@ -198,7 +204,10 @@ export const SettingsMenu = React.memo(function SettingsMenu({
                             {/* Subtitles Menu trigger */}
                             <button
                                 type="button"
-                                onClick={() => setSettingsMenu('subtitles')}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSettingsMenu('subtitles');
+                                }}
                                 className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-white/10 transition-colors text-left"
                                 role="menuitem"
                             >
@@ -212,7 +221,10 @@ export const SettingsMenu = React.memo(function SettingsMenu({
                             {sources && sources.length > 0 && (
                                 <button
                                     type="button"
-                                    onClick={() => setSettingsMenu('quality')}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSettingsMenu('quality');
+                                    }}
                                     className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-white/10 transition-colors text-left"
                                     role="menuitem"
                                 >
@@ -230,7 +242,10 @@ export const SettingsMenu = React.memo(function SettingsMenu({
                         <div>
                             <button
                                 type="button"
-                                onClick={() => setSettingsMenu('main')}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSettingsMenu('main');
+                                }}
                                 className="w-full text-left text-xs text-neutral-500 font-bold px-3 py-2 border-b border-neutral-800/50 hover:text-white transition-colors"
                                 aria-label="Back to main settings"
                             >
@@ -240,7 +255,10 @@ export const SettingsMenu = React.memo(function SettingsMenu({
                                 <button
                                     key={rate}
                                     type="button"
-                                    onClick={() => selectSpeed(rate)}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        selectSpeed(rate);
+                                    }}
                                     className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-white/10 transition-colors text-left"
                                     role="menuitemradio"
                                     aria-checked={playbackRate === rate}
@@ -257,7 +275,10 @@ export const SettingsMenu = React.memo(function SettingsMenu({
                         <div>
                             <button
                                 type="button"
-                                onClick={() => setSettingsMenu('main')}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSettingsMenu('main');
+                                }}
                                 className="w-full text-left text-xs text-neutral-500 font-bold px-3 py-2 border-b border-neutral-800/50 hover:text-white transition-colors"
                                 aria-label="Back to main settings"
                             >
@@ -265,7 +286,10 @@ export const SettingsMenu = React.memo(function SettingsMenu({
                             </button>
                             <button
                                 type="button"
-                                onClick={() => selectTrack(-1)}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    selectTrack(-1);
+                                }}
                                 className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-white/10 transition-colors text-left"
                                 role="menuitemradio"
                                 aria-checked={activeTrackIndex === -1}
@@ -277,7 +301,10 @@ export const SettingsMenu = React.memo(function SettingsMenu({
                                 <button
                                     key={idx}
                                     type="button"
-                                    onClick={() => selectTrack(idx)}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        selectTrack(idx);
+                                    }}
                                     className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-white/10 transition-colors text-left"
                                     role="menuitemradio"
                                     aria-checked={activeTrackIndex === idx}
@@ -294,7 +321,10 @@ export const SettingsMenu = React.memo(function SettingsMenu({
                         <div>
                             <button
                                 type="button"
-                                onClick={() => setSettingsMenu('main')}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSettingsMenu('main');
+                                }}
                                 className="w-full text-left text-xs text-neutral-500 font-bold px-3 py-2 border-b border-neutral-800/50 hover:text-white transition-colors"
                                 aria-label="Back to main settings"
                             >
@@ -304,7 +334,10 @@ export const SettingsMenu = React.memo(function SettingsMenu({
                                 <button
                                     key={q}
                                     type="button"
-                                    onClick={() => selectQuality(q)}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        selectQuality(q);
+                                    }}
                                     className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-white/10 transition-colors text-left"
                                     role="menuitemradio"
                                     aria-checked={activeQuality === q}
