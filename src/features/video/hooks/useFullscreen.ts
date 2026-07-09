@@ -70,18 +70,44 @@ export function useFullscreen(video: HTMLVideoElement | null) {
             }
         };
 
+        const onWebKitBeginFullscreen = () => {
+            setFullscreen(true);
+            const orientation = window.screen?.orientation as any;
+            if (orientation && orientation.lock) {
+                orientation.lock('landscape').catch(() => {});
+            }
+        };
+
+        const onWebKitEndFullscreen = () => {
+            setFullscreen(false);
+            const orientation = window.screen?.orientation as any;
+            if (orientation && orientation.unlock) {
+                orientation.unlock();
+            }
+        };
+
         document.addEventListener('fullscreenchange', onFullscreenChange);
         document.addEventListener('webkitfullscreenchange', onFullscreenChange);
         document.addEventListener('mozfullscreenchange', onFullscreenChange);
         document.addEventListener('MSFullscreenChange', onFullscreenChange);
+
+        if (video) {
+            video.addEventListener('webkitbeginfullscreen', onWebKitBeginFullscreen);
+            video.addEventListener('webkitendfullscreen', onWebKitEndFullscreen);
+        }
 
         return () => {
             document.removeEventListener('fullscreenchange', onFullscreenChange);
             document.removeEventListener('webkitfullscreenchange', onFullscreenChange);
             document.removeEventListener('mozfullscreenchange', onFullscreenChange);
             document.removeEventListener('MSFullscreenChange', onFullscreenChange);
+
+            if (video) {
+                video.removeEventListener('webkitbeginfullscreen', onWebKitBeginFullscreen);
+                video.removeEventListener('webkitendfullscreen', onWebKitEndFullscreen);
+            }
         };
-    }, [setFullscreen, getFullscreenElement]);
+    }, [video, setFullscreen, getFullscreenElement]);
 
     return {
         isFullscreen,

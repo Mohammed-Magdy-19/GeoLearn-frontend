@@ -32,7 +32,7 @@ export const DesktopControlsBar = React.memo(function DesktopControlsBar({
     durationTextRef,
 }: DesktopControlsBarProps) {
     return (
-        <div className="hidden sm:flex items-center justify-between gap-4 w-full">
+        <div className="flex items-center justify-between gap-4 w-full">
             {/* Left controls */}
             <div className="flex items-center gap-3">
                 <button

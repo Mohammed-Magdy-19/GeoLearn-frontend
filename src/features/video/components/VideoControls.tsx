@@ -15,7 +15,7 @@
 //   • 9. SOLID refactoring: extracted logic into 5 custom hooks and 3 subcomponents.
 // ─────────────────────────────────────────────────────────────
 
-import { useEffect, useRef, useMemo } from 'react';
+import { useEffect, useRef, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useVideoControlsStore } from '../hooks/useVideoControlsStore';
 import { ProgressBar } from './ProgressBar';
@@ -32,6 +32,19 @@ import type { VideoControlsProps, ImperativeRefs } from '../types/video-controls
 export function VideoControls({ video, plyr, sources, onQualityChange }: VideoControlsProps) {
     const isPlaying = useVideoControlsStore((s) => s.isPlaying);
     const controlsVisible = useVideoControlsStore((s) => s.controlsVisible);
+
+    const [isMobileLayout, setIsMobileLayout] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            const isSmall = window.innerWidth < 1024 && isTouch;
+            setIsMobileLayout(isSmall || window.innerWidth < 640);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     // Refs for high-frequency DOM nodes to prevent React re-renders (Performance #1 & #3)
     const playedBarRef = useRef<HTMLDivElement>(null);
@@ -114,16 +127,31 @@ export function VideoControls({ video, plyr, sources, onQualityChange }: VideoCo
             onClick={resetHideTimeout}
         >
             {/* ── TOP BUTTONS OVERLAY (Mobile Layout Only) ──────────── */}
-            <MobileTopBar
-                video={video}
-                plyr={plyr}
-                sources={sources}
-                onQualityChange={onQualityChange}
-                isFullscreen={isFullscreen}
-                handleFullscreenToggle={handleFullscreenToggle}
-                setVideoVolume={(val) => setVideoVolume(video, val)}
-                setVideoMuted={(muted) => setVideoMuted(video, muted)}
-            />
+            {isMobileLayout ? (
+                <MobileTopBar
+                    video={video}
+                    plyr={plyr}
+                    sources={sources}
+                    onQualityChange={onQualityChange}
+                    isFullscreen={isFullscreen}
+                    handleFullscreenToggle={handleFullscreenToggle}
+                    setVideoVolume={(val) => setVideoVolume(video, val)}
+                    setVideoMuted={(muted) => setVideoMuted(video, muted)}
+                />
+            ) : (
+                <div className="sm:hidden w-full">
+                    <MobileTopBar
+                        video={video}
+                        plyr={plyr}
+                        sources={sources}
+                        onQualityChange={onQualityChange}
+                        isFullscreen={isFullscreen}
+                        handleFullscreenToggle={handleFullscreenToggle}
+                        setVideoVolume={(val) => setVideoVolume(video, val)}
+                        setVideoMuted={(muted) => setVideoMuted(video, muted)}
+                    />
+                </div>
+            )}
 
             {/* Empty space for middle click - Single-click center area to toggle play/pause */}
             <div
@@ -144,30 +172,46 @@ export function VideoControls({ video, plyr, sources, onQualityChange }: VideoCo
                 />
 
                 {/* Desktop & Tablet Controls Layout */}
-                <DesktopControlsBar
-                    video={video}
-                    plyr={plyr}
-                    sources={sources}
-                    onQualityChange={onQualityChange}
-                    isPlaying={isPlaying}
-                    isFullscreen={isFullscreen}
-                    togglePlay={() => togglePlay(video)}
-                    skipTime={(amount) => skipTime(video, amount)}
-                    handleFullscreenToggle={handleFullscreenToggle}
-                    setVideoVolume={(val) => setVideoVolume(video, val)}
-                    setVideoMuted={(muted) => setVideoMuted(video, muted)}
-                    currentTimeTextRef={currentTimeTextRef}
-                    durationTextRef={durationTextRef}
-                />
+                {isMobileLayout ? null : (
+                    <div className="hidden sm:block w-full">
+                        <DesktopControlsBar
+                            video={video}
+                            plyr={plyr}
+                            sources={sources}
+                            onQualityChange={onQualityChange}
+                            isPlaying={isPlaying}
+                            isFullscreen={isFullscreen}
+                            togglePlay={() => togglePlay(video)}
+                            skipTime={(amount) => skipTime(video, amount)}
+                            handleFullscreenToggle={handleFullscreenToggle}
+                            setVideoVolume={(val) => setVideoVolume(video, val)}
+                            setVideoMuted={(muted) => setVideoMuted(video, muted)}
+                            currentTimeTextRef={currentTimeTextRef}
+                            durationTextRef={durationTextRef}
+                        />
+                    </div>
+                )}
 
                 {/* Mobile & Tablet Controls Layout */}
-                <MobileControlsBar
-                    isPlaying={isPlaying}
-                    togglePlay={() => togglePlay(video)}
-                    skipTime={(amount) => skipTime(video, amount)}
-                    currentTimeTextMobileRef={currentTimeTextMobileRef}
-                    durationTextMobileRef={durationTextMobileRef}
-                />
+                {isMobileLayout ? (
+                    <MobileControlsBar
+                        isPlaying={isPlaying}
+                        togglePlay={() => togglePlay(video)}
+                        skipTime={(amount) => skipTime(video, amount)}
+                        currentTimeTextMobileRef={currentTimeTextMobileRef}
+                        durationTextMobileRef={durationTextMobileRef}
+                    />
+                ) : (
+                    <div className="sm:hidden w-full">
+                        <MobileControlsBar
+                            isPlaying={isPlaying}
+                            togglePlay={() => togglePlay(video)}
+                            skipTime={(amount) => skipTime(video, amount)}
+                            currentTimeTextMobileRef={currentTimeTextMobileRef}
+                            durationTextMobileRef={durationTextMobileRef}
+                        />
+                    </div>
+                )}
             </div>
         </div>
     );

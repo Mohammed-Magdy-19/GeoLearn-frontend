@@ -22,7 +22,7 @@ export const MobileTopBar = React.memo(function MobileTopBar({
     setVideoMuted,
 }: MobileTopBarProps) {
     return (
-        <div className="flex items-center justify-between w-full pointer-events-auto sm:hidden" dir="ltr">
+        <div className="flex items-center justify-between w-full pointer-events-auto" dir="ltr">
             {/* Speaker icon top-left */}
             <VolumeControl
                 video={video}

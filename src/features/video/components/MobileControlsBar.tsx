@@ -17,7 +17,7 @@ export const MobileControlsBar = React.memo(function MobileControlsBar({
     durationTextMobileRef,
 }: MobileControlsBarProps) {
     return (
-        <div className="flex sm:hidden items-center justify-between w-full">
+        <div className="flex items-center justify-between w-full">
             {/* Current Time Left */}
             <span ref={currentTimeTextMobileRef} className="text-xs font-mono text-neutral-300">
                 00:00
