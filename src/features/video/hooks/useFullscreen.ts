@@ -50,7 +50,24 @@ export function useFullscreen(video: HTMLVideoElement | null) {
 
     useEffect(() => {
         const onFullscreenChange = () => {
-            setFullscreen(!!getFullscreenElement());
+            const activeFs = !!getFullscreenElement();
+            setFullscreen(activeFs);
+
+            if (activeFs) {
+                // Lock screen orientation to landscape (flip screen horizontally) on mobile when entering fullscreen
+                const orientation = window.screen?.orientation as any;
+                if (orientation && orientation.lock) {
+                    orientation.lock('landscape').catch(() => {
+                        // Desktop browsers or unsupported platforms will fail gracefully
+                    });
+                }
+            } else {
+                // Unlock screen orientation when exiting fullscreen
+                const orientation = window.screen?.orientation as any;
+                if (orientation && orientation.unlock) {
+                    orientation.unlock();
+                }
+            }
         };
 
         document.addEventListener('fullscreenchange', onFullscreenChange);
