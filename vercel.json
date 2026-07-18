@@ -46,7 +46,7 @@
             "destination": "https://railway.app*"
         },
         {
-            "source": "/((?!assets/|robots\\.txt|sitemap\\.xml|favicon\\.svg|icons\\.svg).*)",
+            "source": "/(.*)",
             "destination": "/index.html"
         }
     ]
