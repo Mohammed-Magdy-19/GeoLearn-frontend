@@ -44,6 +44,7 @@ const NAV_LINKS: readonly NavLink[] = [
   { labelKey: "nav.home", href: "/" },
   { labelKey: "nav.courses", href: "/courses" },
   { labelKey: "nav.metadata", href: "/metadata" },
+  { labelKey: "nav.programs", href: "/programs" },
   { labelKey: "nav.spatialData", href: "/spatial-data" },
 ];
 
@@ -133,13 +134,13 @@ export default function Header() {
         </div>
 
         {/* ── Center: Desktop navigation links ── */}
-        <nav className="hidden lg:flex items-center gap-1">
+        <nav className="hidden xl:flex items-center gap-1">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
               to={link.href}
               className={cn(
-                "relative px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+                "relative px-2.5 py-1.5 rounded-lg text-sm font-medium transition-all duration-200",
                 isActive(link.href)
                   ? "text-brand-warm bg-white/10"
                   : "text-white/85 hover:text-white hover:bg-white/5"
@@ -155,21 +156,21 @@ export default function Header() {
         </nav>
 
         {/* ── Right Section: Auth buttons (desktop) + Hamburger ── */}
-        <div className="flex items-center gap-2">
-          {/* Auth buttons — desktop only (lg+) */}
-          <div className="hidden lg:flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
+          {/* Auth buttons — desktop only (xl+) */}
+          <div className="hidden xl:flex items-center gap-1.5">
             {isHydrating ? (
               /* Skeleton placeholders while auth state is loading */
               <>
-                <span className="h-9 w-24 rounded-full bg-white/10 animate-pulse" />
                 <span className="h-9 w-20 rounded-full bg-white/10 animate-pulse" />
+                <span className="h-9 w-16 rounded-full bg-white/10 animate-pulse" />
               </>
             ) : user ? (
               <>
                 <Link
                   to="/my-courses"
                   className={cn(
-                    "rounded-full px-4 py-2 text-sm font-medium transition-all duration-200",
+                    "rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200",
                     "border border-white/20 text-white/90 hover:border-brand-warm/40 hover:bg-brand-warm/10 hover:text-white"
                   )}
                 >
@@ -178,7 +179,7 @@ export default function Header() {
                 <Link
                   to="/summaries"
                   className={cn(
-                    "rounded-full px-4 py-2 text-sm font-medium transition-all duration-200",
+                    "rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200",
                     "border border-white/20 text-white/90 hover:border-brand-warm/40 hover:bg-brand-warm/10 hover:text-white"
                   )}
                 >
@@ -186,14 +187,14 @@ export default function Header() {
                 </Link>
                 <Link
                   to="/profile"
-                  className="rounded-full bg-brand-primary px-4 py-2 text-sm font-bold text-white shadow-md transition-all duration-200 hover:brightness-110 hover:shadow-lg"
+                  className="rounded-full bg-brand-primary px-3 py-1.5 text-xs font-bold text-white shadow-md transition-all duration-200 hover:brightness-110 hover:shadow-lg"
                 >
                   {t("nav.profile")}
                 </Link>
                 {(user.is_staff || user.is_superuser) && (
                   <Link
                     to="/dashboard"
-                    className="rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:bg-white/20"
+                    className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-medium text-white transition-all duration-200 hover:bg-white/20"
                   >
                     {t("nav.dashboard")}
                   </Link>
@@ -203,13 +204,13 @@ export default function Header() {
               <>
                 <Link
                   to="/login"
-                  className="rounded-full bg-brand-primary px-5 py-2 text-sm font-bold text-white shadow-md transition-all duration-200 hover:brightness-110 hover:shadow-lg"
+                  className="rounded-full bg-brand-primary px-4 py-1.5 text-xs font-bold text-white shadow-md transition-all duration-200 hover:brightness-110 hover:shadow-lg"
                 >
                   {t("nav.login")}
                 </Link>
                 <Link
                   to="/register"
-                  className="rounded-full border-2 border-white/30 px-5 py-2 text-sm font-bold text-white transition-all duration-200 hover:border-brand-warm hover:bg-brand-warm/10"
+                  className="rounded-full border-2 border-white/30 px-4 py-1.5 text-xs font-bold text-white transition-all duration-200 hover:border-brand-warm hover:bg-brand-warm/10"
                 >
                   {t("nav.register")}
                 </Link>
@@ -217,13 +218,13 @@ export default function Header() {
             )}
           </div>
 
-          {/* Hamburger toggle — visible on mobile + tablet (< lg) */}
+          {/* Hamburger toggle — visible on mobile + tablet (< xl) */}
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setMobileMenuOpen((prev) => !prev)}
             className={cn(
-              "lg:hidden h-10 w-10 rounded-lg transition-all duration-200",
+              "xl:hidden h-10 w-10 rounded-lg transition-all duration-200",
               mobileMenuOpen
                 ? "bg-white/15 text-brand-warm"
                 : "text-white/80 hover:bg-white/10 hover:text-white"
@@ -239,7 +240,7 @@ export default function Header() {
       {/* ── Mobile/Tablet Navigation Drawer ── */}
       <div
         className={cn(
-          "lg:hidden overflow-hidden transition-all duration-300 ease-in-out",
+          "xl:hidden overflow-hidden transition-all duration-300 ease-in-out",
           mobileMenuOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
         )}
       >
@@ -344,7 +345,7 @@ export default function Header() {
       {/* Mobile overlay backdrop */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 top-full bg-black/30 lg:hidden -z-10"
+          className="fixed inset-0 top-full bg-black/30 xl:hidden -z-10"
           onClick={handleNavClick}
           aria-hidden="true"
         />

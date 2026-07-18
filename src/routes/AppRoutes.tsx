@@ -51,6 +51,7 @@ const ProfilePage = lazy(() => import("@/features/user-profile/pages/ProfilePage
 const MyCoursesPage = lazy(() => import("@/features/courses/pages/MyCoursesPage"));
 const SummariesPage = lazy(() => import("@/features/courses/pages/SummariesPage"));
 const MetadataPage = lazy(() => import("@/features/courses/pages/MetadataPage"));
+const ProgramsPage = lazy(() => import("@/features/courses/pages/ProgramsPage"));
 const SpatialDataPage = lazy(() => import("@/features/courses/pages/SpatialDataPage"));
 const NotificationsPage = lazy(() => import("@/features/notifications/pages/NotificationsPage"));
 const WatchPage = lazy(() =>
@@ -65,6 +66,7 @@ const UsersManagementPage = lazy(() => import("@/features/dashboard/pages/UsersM
 const CoursesManagementPage = lazy(() => import("@/features/dashboard/pages/CoursesManagementPage"));
 const SummariesManagementPage = lazy(() => import("@/features/dashboard/pages/SummariesManagementPage"));
 const MetadataManagementPage = lazy(() => import("@/features/dashboard/pages/MetadataManagementPage"));
+const ProgramsManagementPage = lazy(() => import("@/features/dashboard/pages/ProgramsManagementPage"));
 const SpatialDataManagementPage = lazy(() => import("@/features/dashboard/pages/SpatialDataManagementPage"));
 const NotificationsManagementPage = lazy(() => import("@/features/dashboard/pages/NotificationsManagementPage"));
 
@@ -106,6 +108,7 @@ export const AppRoutes = () => (
         <Route path="/my-courses" element={<Lazy><MyCoursesPage /></Lazy>} />
         <Route path="/summaries" element={<Lazy><SummariesPage /></Lazy>} />
         <Route path="/metadata" element={<Lazy><MetadataPage /></Lazy>} />
+        <Route path="/programs" element={<Lazy><ProgramsPage /></Lazy>} />
         <Route path="/spatial-data" element={<Lazy><SpatialDataPage /></Lazy>} />
         <Route path="/notifications" element={<Lazy><NotificationsPage /></Lazy>} />
         <Route path="/courses/:slug/watch/:lessonId" element={<Lazy><WatchPage /></Lazy>} />
@@ -127,6 +130,7 @@ export const AppRoutes = () => (
         <Route path="/dashboard/courses/:courseId" element={<Lazy><CoursesManagementPage /></Lazy>} />
         <Route path="/dashboard/summaries" element={<Lazy><SummariesManagementPage /></Lazy>} />
         <Route path="/dashboard/metadata" element={<Lazy><MetadataManagementPage /></Lazy>} />
+        <Route path="/dashboard/programs" element={<Lazy><ProgramsManagementPage /></Lazy>} />
         <Route path="/dashboard/spatial-data" element={<Lazy><SpatialDataManagementPage /></Lazy>} />
         <Route path="/dashboard/notifications" element={<Lazy><NotificationsManagementPage /></Lazy>} />
       </Route>

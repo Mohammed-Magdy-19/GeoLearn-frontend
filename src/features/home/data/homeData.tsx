@@ -15,54 +15,12 @@
 import { Crosshair, Handshake, Lightbulb, BarChart3, MapPin, Mail, Phone } from "lucide-react";
 
 import type {
-    Course,
     AboutItem,
     StatItem,
     LevelItem,
     QuickLink,
     ContactInfo,
 } from "../types/home";
-
-/** Available course offerings displayed on the home page */
-export const COURSES: readonly Course[] = [
-    {
-        slug: "arcgis-pro",
-        title: "courses.masterArcGIS",
-        badge: "courses.bestSeller",
-        hours: "courses.hours",
-        level: "courses.beginnerToAdvanced",
-        description: "courses.masterArcGISDesc",
-        price: "3,700",
-        logoImage:
-            "https://upload.wikimedia.org/wikipedia/commons/d/df/ArcGIS_logo.png",
-        coverImage:
-            "https://images.unsplash.com/photo-1524661135-423995f22d0b?w=1200&q=80",
-    },
-    {
-        slug: "surveying-basics",
-        title: "courses.surveyingBasics",
-        badge: null,
-        hours: "courses.hours",
-        level: "courses.beginner",
-        description: "courses.surveyingBasicsDesc",
-        price: "3,450",
-        logoImage: null,
-        coverImage:
-            "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1200&q=80",
-    },
-    {
-        slug: "remote-sensing-drones",
-        title: "courses.remoteSensing",
-        badge: "courses.new",
-        hours: "courses.hours",
-        level: "courses.intermediate",
-        description: "courses.remoteSensingDesc",
-        price: "3,000",
-        logoImage: null,
-        coverImage:
-            "https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=1200&q=80",
-    },
-];
 
 /** About section info cards — uses translation keys */
 export const ABOUT_ITEMS: readonly AboutItem[] = [
