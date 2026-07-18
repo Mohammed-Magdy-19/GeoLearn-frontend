@@ -38,7 +38,7 @@ export function resolvePath<K extends RouteKey>(
 }
 
 /**
- * Hook for type-safe programmatic navigation.
+ * Hook for type-safe programmatic navigation and static path resolution.
  */
 export function useAppNavigate() {
   const navigate = useNavigate();
@@ -48,7 +48,6 @@ export function useAppNavigate() {
     params?: K extends keyof RouteParams ? RouteParams[K] : undefined,
     options?: NavigateOptions
   ) => {
-    // Resolve route path with parameters
     const path = resolvePath(
       key,
       ...(params ? [params] : []) as K extends keyof RouteParams ? [RouteParams[K]] : []
@@ -56,9 +55,26 @@ export function useAppNavigate() {
     navigate(path, options);
   };
 
+  const getPath = <K extends RouteKey>(
+    key: K,
+    params?: K extends keyof RouteParams ? RouteParams[K] : undefined
+  ): string => {
+    return resolvePath(
+      key,
+      ...(params ? [params] : []) as K extends keyof RouteParams ? [RouteParams[K]] : []
+    );
+  };
+
+  const goBack = () => {
+    navigate(-1);
+  };
+
   return {
     navigateTo,
+    getPath,
+    goBack,
     resolvePath,
   };
 }
+
 export type AppNavigateType = ReturnType<typeof useAppNavigate>;

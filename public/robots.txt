@@ -1,25 +1,47 @@
-User-agent:Googlebot
-Allow:/
-Disallow:/dashboard/
-Disallow:/login
-Disallow:/register
-Disallow:/profile
-Disallow:/my-courses
-Disallow:/summaries
-Disallow:/metadata
-Disallow:/programs
-Disallow:/spatial-data
-Disallow:/notifications
-User-agent:*
-Allow:/
-Disallow:/dashboard/
-Disallow:/login
-Disallow:/register
-Disallow:/profile
-Disallow:/my-courses
-Disallow:/summaries
-Disallow:/metadata
-Disallow:/programs
-Disallow:/spatial-data
-Disallow:/notifications
-Sitemap:https://geo-learn-frontend.vercel.app/sitemap.xml
+# ─── Googlebot ───────────────────────────────────────────
+User-agent: Googlebot
+Allow: /
+Allow: /courses
+Disallow: /dashboard/
+Disallow: /login
+Disallow: /register
+Disallow: /profile
+Disallow: /my-courses
+Disallow: /summaries
+Disallow: /metadata
+Disallow: /programs
+Disallow: /spatial-data
+Disallow: /notifications
+
+# ─── Bingbot ─────────────────────────────────────────────
+User-agent: Bingbot
+Allow: /
+Allow: /courses
+Disallow: /dashboard/
+Disallow: /login
+Disallow: /register
+Disallow: /profile
+Disallow: /my-courses
+Disallow: /summaries
+Disallow: /metadata
+Disallow: /programs
+Disallow: /spatial-data
+Disallow: /notifications
+
+# ─── All other crawlers ──────────────────────────────────
+User-agent: *
+Allow: /
+Allow: /courses
+Disallow: /dashboard/
+Disallow: /login
+Disallow: /register
+Disallow: /profile
+Disallow: /my-courses
+Disallow: /summaries
+Disallow: /metadata
+Disallow: /programs
+Disallow: /spatial-data
+Disallow: /notifications
+
+# ─── Sitemap index ───────────────────────────────────────
+Sitemap: https://geo-learn-frontend.vercel.app/sitemap.xml
