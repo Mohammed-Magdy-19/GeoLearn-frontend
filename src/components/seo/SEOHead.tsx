@@ -19,11 +19,11 @@ import { Helmet } from "react-helmet-async";
 
 // ── Constants ──────────────────────────────────────────────────────────────
 
-const SITE_NAME = "GeoLearn";
+const SITE_NAME = "GIS in the 50s";
 const BASE_URL = "https://geo-learn-frontend.vercel.app";
-const DEFAULT_TITLE = "GeoLearn - Interactive Geography & Spatial Data Learning";
+const DEFAULT_TITLE = "GIS in the 50s";
 const DEFAULT_DESCRIPTION =
-  "GeoLearn - An interactive, modern platform for learning geography, spatial data science, and GIS mapping.";
+  "From the heart of the lecture hall to every spot on the map — students and youth bridging academic and practical science, explaining GIS and surveying simply and creatively outside the box.";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
