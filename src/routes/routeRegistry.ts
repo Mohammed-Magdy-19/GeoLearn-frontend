@@ -31,10 +31,10 @@ export const publicRoutes: PublicRouteConfig[] = [
     loader: () => import("@/features/home/page/Home"),
     guard: { requiresAuth: false, allowedRoles: [] },
     meta: {
-      title: "GeoLearn - Interactive Geography & Spatial Data Learning",
+      title: "GIS in the 50s",
       rawTitle: true,
       description:
-        "GeoLearn - An interactive, modern platform for learning geography, spatial data science, and GIS mapping.",
+        "From the heart of the lecture hall to every spot on the map — students and youth bridging academic and practical science, explaining GIS and surveying simply and creatively outside the box.",
       canonical: "/",
       keywords: "geography, GIS, spatial data, learning, courses, mapping",
     },
