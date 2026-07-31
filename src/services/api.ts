@@ -34,10 +34,12 @@ import type {
 
 // ── Base Configuration ────────────────────────────────────────────────────
 
-// 1. Fetch the raw domain variable safely first
-const rawBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+// When VITE_API_BASE_URL is set (e.g. "http://localhost:8000" in dev), use it.
+// When unset/empty (production on Vercel), default to "/" so requests go to
+// the same origin (/api/...) and Vercel's rewrite proxy forwards to Railway.
+// This eliminates CORS entirely in production.
+const rawBaseUrl = import.meta.env.VITE_API_BASE_URL || "/";
 
-// 2. Format it safely to guarantee a single closing slash before appending 'api'
 const formattedBaseUrl = rawBaseUrl.endsWith("/") ? rawBaseUrl : `${rawBaseUrl}/`;
 
 export const BASE_URL = `${formattedBaseUrl}api`;
