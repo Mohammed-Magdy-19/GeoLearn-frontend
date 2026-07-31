@@ -43,7 +43,7 @@
     "rewrites": [
         {
             "source": "/api/:match*",
-            "destination": "https://geolearn-backend-production-6025.up.railway.app/api/:match*"
+            "destination": "https://geolearn-backend-production.up.railway.app/api/:match*"
         },
         {
             "source": "/(.*)",
