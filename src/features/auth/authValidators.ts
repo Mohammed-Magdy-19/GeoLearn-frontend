@@ -31,9 +31,10 @@ const passwordSchema = z
 
 // ── Login Schema ───────────────────────────────────────────────────────────
 export const loginSchema = z.object({
-  username: z
+  email: z
     .string()
-    .min(1, "Username is required.")
+    .min(1, "Email address is required.")
+    .email("Enter a valid email address.")
     .transform((val) => val.toLowerCase().trim()),
   password: z.string().min(1, "Password is required."),
 });
@@ -51,9 +52,9 @@ export const registerSchema = z
       .trim(),
     email: z
       .string()
+      .min(1, "Email address is required.")
       .email("Enter a valid email address.")
-      .optional()
-      .or(z.literal("")), // Allow empty string (field is optional)
+      .transform((val) => val.toLowerCase().trim()),
     password: passwordSchema,
     password_confirm: z.string().min(1, "Please confirm your password."),
   })

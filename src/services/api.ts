@@ -26,6 +26,11 @@
 import axios, { AxiosError, type AxiosInstance } from "axios";
 import type { InternalAxiosRequestConfig } from "axios";
 import { useAuthStore } from "../store/useAuthStore";
+import type {
+  VerifyEmailRequest,
+  VerifyEmailResponse,
+  ResendVerificationResponse,
+} from "../features/auth/types";
 
 // ── Base Configuration ────────────────────────────────────────────────────
 
@@ -99,10 +104,12 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // Exclude login and register requests from auto-refresh/redirect
+    // Exclude auth endpoints from auto-refresh/redirect
     if (
       originalRequest.url?.includes("/auth/login") ||
-      originalRequest.url?.includes("/auth/register")
+      originalRequest.url?.includes("/auth/register") ||
+      originalRequest.url?.includes("/auth/verify-email") ||
+      originalRequest.url?.includes("/auth/resend-verification")
     ) {
       return Promise.reject(error);
     }
@@ -362,6 +369,20 @@ export const cleanupVideoBlob = (blobUrl: string | null): void => {
   if (blobUrl && blobUrl.startsWith("blob:")) {
     URL.revokeObjectURL(blobUrl);
   }
+};
+
+// ── Email Verification APIs ───────────────────────────────────────────────
+
+export const verifyEmail = async (
+  payload: VerifyEmailRequest
+): Promise<VerifyEmailResponse> => {
+  const { data } = await api.post<VerifyEmailResponse>("/auth/verify-email/", payload);
+  return data;
+};
+
+export const resendVerification = async (): Promise<ResendVerificationResponse> => {
+  const { data } = await api.post<ResendVerificationResponse>("/auth/resend-verification/");
+  return data;
 };
 
 // ── Default Export ───────────────────────────────────────────────────────

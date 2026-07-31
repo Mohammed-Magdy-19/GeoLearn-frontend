@@ -12,6 +12,7 @@ export const ROUTE_PATHS = {
   COURSE_DETAIL: "/courses/:courseId",
   LOGIN: "/login",
   REGISTER: "/register",
+  VERIFY_EMAIL: "/verify-email",
   PROFILE: "/profile",
   MY_COURSES: "/my-courses",
   SUMMARIES: "/summaries",

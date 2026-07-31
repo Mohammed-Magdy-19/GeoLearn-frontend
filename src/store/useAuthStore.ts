@@ -23,6 +23,7 @@ export interface AuthUser {
   email: string | null;
   avatar: string | null;
   date_joined: string;
+  is_email_verified?: boolean;
   is_superuser?: boolean;
   is_staff?: boolean;
   phone_number?: string | null;

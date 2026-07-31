@@ -42,6 +42,11 @@ export function RouteGuardEngine({ guard, children }: RouteGuardEngineProps) {
     return <Navigate to="/login" replace />;
   }
 
+  // 2.5. Email Verification Check
+  if (guard.requiresAuth && user && !user.is_email_verified) {
+    return <Navigate to="/verify-email" replace />;
+  }
+
   // 3. Authorization / Role Check
   if (guard.requiresAuth && user && guard.allowedRoles.length > 0) {
     const userRole = getUserRole(user);

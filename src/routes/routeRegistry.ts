@@ -106,6 +106,20 @@ export const authRoutes: AuthRouteConfig[] = [
       robots: "noindex, follow",
     },
   },
+  {
+    key: "VERIFY_EMAIL",
+    path: ROUTE_PATHS.VERIFY_EMAIL,
+    type: "auth",
+    layout: "auth",
+    loader: () => import("@/features/auth/components/VerifyEmailPage"),
+    guard: { requiresAuth: false, allowedRoles: [] },
+    meta: {
+      title: "Verify Email",
+      description: "Verify your email address to complete registration.",
+      canonical: "/verify-email",
+      robots: "noindex, nofollow",
+    },
+  },
 ];
 
 // ── Protected Student Routes ───────────────────────────────────────────────

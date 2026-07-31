@@ -11,9 +11,10 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import api from "../../../services/api"
+import api, { verifyEmail, resendVerification } from "../../../services/api";
 import { useAuthStore, type AuthUser } from "../../../store/useAuthStore";
 import type { LoginFormValues, RegisterFormValues } from "../authValidators";
+import type { VerifyEmailRequest, VerifyEmailResponse, ResendVerificationResponse } from "../types";
 
 // ── API Response Types ─────────────────────────────────────────────────────
 
@@ -73,7 +74,7 @@ export const useLoginMutation = () => {
  * On success, immediately fires a login request with the same credentials
  * so the user gets a token pair without a manual sign-in step, then
  * stores tokens + user in Zustand (persisted to localStorage) and
- * navigates to the home page.
+ * navigates to the email verification page.
  */
 export const useRegisterMutation = () => {
   const { setTokens, setUser } = useAuthStore();
@@ -88,7 +89,7 @@ export const useRegisterMutation = () => {
     onSuccess: async (_data, variables) => {
       // Step 2 — auto-login with the credentials just submitted
       const { data: loginData } = await api.post<RegisterLoginResponse>("/auth/login/", {
-        username: variables.username,
+        email: variables.email,
         password: variables.password,
       });
 
@@ -96,8 +97,50 @@ export const useRegisterMutation = () => {
       setTokens(loginData.access, loginData.refresh);
       setUser(loginData.user);
 
-      // Step 4 — send the user straight to the app
+      // Step 4 — navigate to email verification screen
+      navigate("/verify-email");
+    },
+  });
+};
+
+// ── Email Verification Mutation ────────────────────────────────────────────
+
+/**
+ * useVerifyEmailMutation
+ *
+ * Calls POST /api/auth/verify-email/ with the 6-digit OTP code.
+ * On success:
+ *   1. Updates user state in Zustand with is_email_verified = true
+ *   2. Navigates to home page "/"
+ */
+export const useVerifyEmailMutation = () => {
+  const { user, setUser } = useAuthStore();
+  const navigate = useNavigate();
+
+  return useMutation<VerifyEmailResponse, Error, VerifyEmailRequest>({
+    mutationFn: async (payload) => {
+      return await verifyEmail(payload);
+    },
+    onSuccess: () => {
+      if (user) {
+        setUser({ ...user, is_email_verified: true });
+      }
       navigate("/");
+    },
+  });
+};
+
+// ── Resend Verification Mutation ───────────────────────────────────────────
+
+/**
+ * useResendVerificationMutation
+ *
+ * Calls POST /api/auth/resend-verification/ to send a fresh OTP email.
+ */
+export const useResendVerificationMutation = () => {
+  return useMutation<ResendVerificationResponse, Error, void>({
+    mutationFn: async () => {
+      return await resendVerification();
     },
   });
 };

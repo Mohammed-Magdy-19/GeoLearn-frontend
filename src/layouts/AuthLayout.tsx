@@ -69,27 +69,21 @@ export default function AuthLayout() {
         {/* Branding content */}
         <div className="relative z-10 flex flex-col justify-between items-center h-full w-full p-12 text-white text-center">
 
-          {/* Top Row: Logo + Back to Home */}
+          {/* Top Row: Logo */}
           <div className="flex items-center justify-between w-full">
             <Link to="/" className="flex items-center gap-3">
               <span
-            className="grid h-12 w-12 place-items-center rounded-full bg-brand-gradient text-2xl shadow-brand"
-            style={{
-              backgroundImage: `url(${logo})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-          />
+                className="grid h-12 w-12 place-items-center rounded-full bg-brand-gradient text-2xl shadow-brand"
+                style={{
+                  backgroundImage: `url(${logo})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+              />
               <div className="text-start">
                 <p className="font-display text-xl leading-tight font-bold">{t("common.brandName")}</p>
                 <p className="text-xs text-brand-warm">{t("common.brandTagline")}</p>
               </div>
-            </Link>
-            <Link
-              to="/"
-              className="text-xs text-white bg-white/10 hover:bg-white/20 transition px-4 py-2 rounded-full font-bold shadow-sm"
-            >
-              {t("common.backToHome")}
             </Link>
           </div>
 
@@ -104,19 +98,6 @@ export default function AuthLayout() {
               {t("home.authPanelDescription")}
             </p>
 
-            {/* Mini stats row — mirrors the hero section */}
-            <dl className="mt-8 flex gap-8 border-t border-white/10 pt-6 justify-center w-full max-w-xs">
-              {[
-                ["+500", t("home.registeredStudentsStat")],
-                ["3", t("home.specializedCoursesStat")],
-                ["100%", t("home.studentSatisfactionStat")],
-              ].map(([n, l]) => (
-                <div key={l}>
-                  <dt className="font-display text-2xl font-black text-brand-warm">{n}</dt>
-                  <dd className="mt-0.5 text-xs text-white/60">{l}</dd>
-                </div>
-              ))}
-            </dl>
           </div>
 
           {/* Bottom tagline */}
@@ -131,15 +112,8 @@ export default function AuthLayout() {
         className="flex flex-1 items-center justify-center bg-background px-6 py-12 sm:px-10"
       >
         <div className="w-full max-w-md">
-          {/* Back to Home button for both mobile & desktop form views */}
-          <div className="mb-6 flex justify-between items-center">
-            <Link
-              to="/"
-              className="text-xs text-muted-foreground hover:text-foreground bg-muted hover:bg-muted/80 transition px-4 py-2 rounded-full font-bold shadow-sm"
-            >
-              {t("common.backToHome")}
-            </Link>
-
+          {/* Header row above form */}
+          <div className="mb-6 flex justify-end items-center">
             <div className="flex items-center gap-2">
               {/* Language Switcher */}
               <Suspense fallback={<IconButtonSkeleton />}>

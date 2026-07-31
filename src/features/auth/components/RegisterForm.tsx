@@ -111,11 +111,10 @@ export default function RegisterForm() {
           )}
         </div>
 
-        {/* Email (optional) */}
+        {/* Email */}
         <div>
           <Label htmlFor="email" className="mb-1.5">
-            {t("auth.email")}{" "}
-            <span className="text-muted-foreground font-normal text-xs">{t("auth.emailOptional")}</span>
+            {t("auth.email")}
           </Label>
           <Input
             id="email"
