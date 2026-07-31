@@ -31,11 +31,10 @@ const passwordSchema = z
 
 // ── Login Schema ───────────────────────────────────────────────────────────
 export const loginSchema = z.object({
-  email: z
+  username: z
     .string()
-    .min(1, "Email address is required.")
-    .email("Enter a valid email address.")
-    .transform((val) => val.toLowerCase().trim()),
+    .min(1, "Username is required.")
+    .transform((val) => val.trim()),
   password: z.string().min(1, "Password is required."),
 });
 

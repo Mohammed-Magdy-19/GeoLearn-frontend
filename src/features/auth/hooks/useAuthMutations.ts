@@ -89,7 +89,7 @@ export const useRegisterMutation = () => {
     onSuccess: async (_data, variables) => {
       // Step 2 — auto-login with the credentials just submitted
       const { data: loginData } = await api.post<RegisterLoginResponse>("/auth/login/", {
-        email: variables.email,
+        username: variables.username,
         password: variables.password,
       });
 

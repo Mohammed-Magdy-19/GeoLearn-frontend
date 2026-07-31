@@ -74,27 +74,27 @@ export default function LoginForm() {
       {/* ── Form ─────────────────────────────────────────────────────────── */}
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-5">
 
-        {/* Email */}
+        {/* Username */}
         <div>
           <Label
-            htmlFor="email"
+            htmlFor="username"
             className="mb-1.5"
           >
-            {t("auth.email")}
+            {t("auth.username")}
           </Label>
           <Input
-            id="email"
-            type="email"
-            autoComplete="email"
-            placeholder="ahmed@example.com"
-            {...register("email")}
+            id="username"
+            type="text"
+            autoComplete="username"
+            placeholder={t("auth.usernamePlaceholder")}
+            {...register("username")}
             className="rounded-xl px-4 py-2.5 focus-visible:ring-brand-primary/50 focus-visible:border-brand-primary/60"
-            aria-invalid={!!errors.email}
-            aria-describedby={errors.email ? "email-error" : undefined}
+            aria-invalid={!!errors.username}
+            aria-describedby={errors.username ? "username-error" : undefined}
           />
-          {errors.email && (
-            <p id="email-error" className="mt-1.5 text-xs text-destructive">
-              {errors.email.message}
+          {errors.username && (
+            <p id="username-error" className="mt-1.5 text-xs text-destructive">
+              {errors.username.message}
             </p>
           )}
         </div>
