@@ -343,9 +343,9 @@ export default function EgyptMap3D() {
         transition: "opacity 0.8s ease-out",
       }}
       gl={{
-        antialias: false,    // ← was true: big perf win on mobile
+        antialias: false,
         alpha: false,
-        powerPreference: "high-performance",
+        powerPreference: "default",
       }}
       onCreated={handleCreated}
     >
