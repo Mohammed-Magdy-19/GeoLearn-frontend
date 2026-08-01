@@ -13,6 +13,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { AxiosError } from "axios";
 import { registerSchema, type RegisterFormValues } from "../authValidators";
 import { useRegisterMutation } from "../hooks/useAuthMutations";
 import { GraduationCap, AlertTriangle } from "lucide-react";
@@ -25,6 +26,7 @@ export default function RegisterForm() {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -33,7 +35,51 @@ export default function RegisterForm() {
   const registerMutation = useRegisterMutation();
 
   const onSubmit = (data: RegisterFormValues) => {
-    registerMutation.mutate(data);
+    registerMutation.mutate(data, {
+      onError: (err) => {
+        const axiosErr = err as AxiosError<Record<string, string | string[]>>;
+        const responseData = axiosErr.response?.data;
+        if (responseData && typeof responseData === "object") {
+          Object.entries(responseData).forEach(([field, messages]) => {
+            const message = Array.isArray(messages) ? messages[0] : messages;
+            if (
+              field === "username" ||
+              field === "email" ||
+              field === "full_name" ||
+              field === "password" ||
+              field === "password_confirm"
+            ) {
+              setError(field as keyof RegisterFormValues, {
+                type: "server",
+                message,
+              });
+            }
+          });
+        }
+      },
+    });
+  };
+
+  const getServerErrorMessage = () => {
+    if (!registerMutation.error) return null;
+    const axiosErr = registerMutation.error as AxiosError<Record<string, string | string[]>>;
+    const data = axiosErr.response?.data;
+    if (data) {
+      if (typeof data === "string") return data;
+      if ("detail" in data && typeof data.detail === "string") return data.detail;
+
+      const errorMessages: string[] = [];
+      Object.entries(data).forEach(([field, err]) => {
+        const prefix = field === "non_field_errors" || field === "detail" ? "" : `${field}: `;
+        if (Array.isArray(err)) {
+          errorMessages.push(`${prefix}${err.join(", ")}`);
+        } else if (typeof err === "string") {
+          errorMessages.push(`${prefix}${err}`);
+        }
+      });
+      if (errorMessages.length > 0) return errorMessages.join(" | ");
+    }
+    return axiosErr.message || t("auth.registrationFailed");
   };
 
   return (
@@ -53,10 +99,7 @@ export default function RegisterForm() {
       {registerMutation.isError && (
         <div className="mb-5 flex items-start gap-2 rounded-xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm text-destructive">
           <AlertTriangle className="size-4 shrink-0 mt-0.5" aria-hidden="true" />
-          <span>
-            {(registerMutation.error as Error | undefined)?.message ??
-              t("auth.registrationFailed")}
-          </span>
+          <span>{getServerErrorMessage()}</span>
         </div>
       )}
 
