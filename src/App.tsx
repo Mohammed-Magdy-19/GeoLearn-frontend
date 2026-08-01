@@ -47,22 +47,17 @@ export const queryClient = new QueryClient({
 // ── Root Component ─────────────────────────────────────────────────────────
 
 const AuthHydrator = () => {
-  const { accessToken, setUser, setHydrating } = useAuthStore();
+  const { accessToken, setUser, setHydrating, clearAuth } = useAuthStore();
 
   useEffect(() => {
     /**
      * Attempt to restore the user session on app boot.
-     * If an access token exists in memory (same tab, not a hard refresh),
+     * If an access token exists in memory/localStorage,
      * fetch the user profile from /me/ and populate Zustand.
-     *
-     * On hard page refresh, accessToken is null (memory cleared).
-     * The Axios interceptor will attempt a token refresh automatically
-     * if a refreshToken is also available. If both are missing, we simply
-     * set isHydrating = false, letting ProtectedRoute redirect to /login.
      */
     const hydrate = async () => {
       if (!accessToken) {
-        // No token in memory — nothing to hydrate
+        // No token in memory or localStorage — nothing to hydrate
         setHydrating(false);
         return;
       }
@@ -70,7 +65,8 @@ const AuthHydrator = () => {
         const { data } = await api.get<AuthUser>("/auth/me/");
         setUser(data);
       } catch {
-        // Token was invalid or expired — clearAuth is handled by the 401 interceptor
+        // Token was invalid or expired — wipe stale session from localStorage
+        clearAuth();
       } finally {
         setHydrating(false);
       }
@@ -79,7 +75,7 @@ const AuthHydrator = () => {
     hydrate();
   }, []); // Run once on mount only
 
-  return null; // This component renders nothing — it's a side-effect runner
+  return null;
 };
 
 // ── App ────────────────────────────────────────────────────────────────────

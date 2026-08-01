@@ -122,9 +122,8 @@ api.interceptors.response.use(
     const { refreshToken, setTokens, clearAuth } = useAuthStore.getState();
 
     if (!refreshToken) {
-      // No refresh token available — session is completely expired
+      // No refresh token available — session is expired, clear stale tokens
       clearAuth();
-      window.location.href = "/login";
       return Promise.reject(error);
     }
 
@@ -161,9 +160,8 @@ api.interceptors.response.use(
 
       return api(originalRequest);
     } catch (refreshError) {
-      // Refresh token is also expired — force the user to log in again
+      // Refresh token is also expired — wipe stale session from Zustand & localStorage
       clearAuth();
-      window.location.href = "/login";
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;
