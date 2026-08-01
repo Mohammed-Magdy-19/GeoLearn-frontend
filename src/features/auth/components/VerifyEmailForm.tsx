@@ -36,6 +36,9 @@ export default function VerifyEmailForm() {
   const verifyMutation = useVerifyEmailMutation();
   const resendMutation = useResendVerificationMutation();
 
+  // Track whether auto-send has been triggered (prevents double-fire in React.StrictMode)
+  const hasAutoSent = useRef(false);
+
   // Start 60s cooldown timer
   const startCooldown = () => {
     setCooldown(RESEND_COOLDOWN_SECONDS);
@@ -51,9 +54,26 @@ export default function VerifyEmailForm() {
     }, 1000);
   };
 
-  // Start cooldown on mount
+  // Auto-send verification code on mount.
+  // When the user lands on /verify-email (e.g. after login with unverified account),
+  // automatically trigger a resend so they don't have to wait and click "Resend" manually.
+  // Registration already sends a code in RegisterView.create(), but calling resend
+  // again is safe — it invalidates old codes and sends a fresh one.
   useEffect(() => {
-    startCooldown();
+    if (hasAutoSent.current) return;
+    hasAutoSent.current = true;
+
+    resendMutation.mutate(undefined, {
+      onSuccess: () => {
+        startCooldown();
+      },
+      onError: () => {
+        // If auto-send fails (e.g. throttled because registration just sent one),
+        // still start the cooldown so the user sees the timer
+        startCooldown();
+      },
+    });
+
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
